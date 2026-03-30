@@ -1320,9 +1320,9 @@ input, textarea {
       }
 
       if (!isValid) {
-          showToast('Akurasi koordinat tidak memadai (Sedang/Lemah). Cari tempat terbuka & coba lagi.');
+          showToast('Akurasi lemah, coba lagi.');
       } else {
-          showToast('Titik koordinat berhasil didapatkan');
+          showToast('Lokasi berhasil didapatkan');
       }
     }, () => { 
       showToast('Gagal Akses GPS, pastikan izin diaktifkan.'); 
@@ -1372,7 +1372,7 @@ input, textarea {
     let gpsInput = document.getElementById(activeGpsId);
     
     if (gpsInput.dataset.valid === "false") {
-      showToast('Akurasi koordinat GPS minimal harus Tinggi. Silakan perbarui titik lokasi Anda.');
+      showToast('Akurasi GPS lemah, coba lagi.');
       return;
     }
 
@@ -1393,10 +1393,10 @@ input, textarea {
     }
 
     if (!pickupLoc || !pickupDetail || !delivLoc || !delivDetail || !catatan || !contactName || !contactWA || window.currentOrderFare === null) { 
-      showToast('Harap lengkapi semua data wajib (*).'); return; 
+      showToast('Lengkapi semua data wajib (*).'); return; 
     }
     if (window.waktuType === 'Jadwalkan' && !waktuJadwal) {
-      showToast('Harap pilih jam dan tanggal jika memilih Jadwalkan.'); return;
+      showToast('Atur waktu jika memilih Jadwalkan.'); return;
     }
 
     const localId = 'temp-' + Date.now();
