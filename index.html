@@ -376,6 +376,16 @@ input, textarea {
   }
   .search-clear.visible { display: block; }
 
+* {
+    /* Menghilangkan garis kotak di desktop */
+    outline: none !important;
+
+    /* Menghilangkan bayangan biru saat di-tap di HP */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+
   /* ─── ORDER CARD (Proses) ─── */
   .order-card {
     background: var(--white);
@@ -554,17 +564,6 @@ input, textarea {
     font-size: 14px; font-weight: 500;
     color: var(--gray-400); margin-bottom: 20px; line-height: 1.5;
   }
-
-* {
-    /* Menghilangkan garis kotak di desktop */
-    outline: none !important;
-
-    /* Menghilangkan bayangan biru saat di-tap di HP */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-
-
 
   /* ─── INFO LIST ─── */
   .info-list { list-style: none; margin-bottom: 20px; }
