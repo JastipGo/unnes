@@ -375,14 +375,27 @@ input, textarea {
     cursor: pointer; display: none;
   }
   .search-clear.visible { display: block; }
-
+  
+/* Menargetkan SEMUA elemen tanpa ampun */
 * {
-    /* Menghilangkan garis kotak di desktop */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
     outline: none !important;
+    box-shadow: none !important;
+}
 
-    /* Menghilangkan bayangan biru saat di-tap di HP */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+/* Khusus untuk elemen yang benar-benar bisa diklik/difokuskan */
+*:focus, *:active, *:hover {
+    outline: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Mencegah teks terpilih secara tidak sengaja (opsional tapi membantu) */
+.wrapper-konten {
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 
