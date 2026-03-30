@@ -58,18 +58,33 @@ html, body {
     user-select: none;
   }
 
-/* Cancel Bounce Overscroll 
-
-body {
-  position: fixed;
+/* ─── PREVENT COPY / SELECTION & ANTI BOUNCE ─── */
+html, body {
+  margin: 0;
+  padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: hidden; /* Kunci scrolling pada level body */
+  overscroll-behavior: none; /* Cegah pantulan di seluruh halaman */
+  
+  background: var(--gray-100);
+  color: var(--black);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  
+  /* Mencegah seleksi teks */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-.scroll-container {
-  height: 100%;
-  overflow-y: auto;
+/* Mengizinkan seleksi pada input dan textarea */
+input, textarea {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
 }
 
   /* Mengizinkan seleksi pada input dan textarea */
@@ -85,14 +100,18 @@ body {
 
   /* ─── SPLASH / AUTH ─── */
   #splash {
-    position: fixed; inset: 0; z-index: 9000;
-    background: var(--black);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: flex-end;
-    overflow-y: auto;
-    padding: 0;
-  }
-  #splash.hidden { display: none; }
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  
+  height: 100vh;
+  height: 100dvh; /* Mendukung tinggi dinamis mobile */
+  overflow-y: auto;
+  overscroll-behavior-y: none; /* Cegah pantulan */
+  padding: 0;
+}
+#splash.hidden { display: none; }
 
   .splash-hero {
     flex: 1; width: 100%;
@@ -200,16 +219,27 @@ body {
     content: ''; flex: 1; height: 1px; background: var(--gray-200);
   }
 
-  /* ─── APP SHELL ─── */
-  #app { display: none; flex-direction: column; min-height: 100vh; }
-  #app.visible { display: flex; }
+/* ─── APP SHELL ─── */
+#app { 
+  display: none; 
+  flex-direction: column; 
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto; /* Pindahkan scrolling ke dalam app */
+  overscroll-behavior-y: none; /* Stop pantulan saat mentok atas/bawah */
+  -webkit-overflow-scrolling: touch; /* Scroll mulus di iOS */
+}
+#app.visible { display: flex; }
 
   .top-bar {
     position: sticky; top: 0; z-index: 100;
     background: var(--black);
     padding: 0 20px; height: 60px;
     display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; /* Mencegah navbar menyusut saat konten panjang */
+    min-height: 60px; /* Tambahan pengaman untuk tinggi absolut */
   }
+
   .top-bar-brand {
     font-size: 22px; font-weight: 800;
     color: var(--white); letter-spacing: -1px;
@@ -500,13 +530,17 @@ body {
     backdrop-filter: blur(2px);
   }
   .modal-overlay.open { display: flex; }
-  .modal-sheet {
-    background: var(--white);
-    border-radius: 24px 24px 0 0;
-    padding: 8px 24px 40px;
-    width: 100%; max-width: 500px;
-    max-height: 90vh; overflow-y: auto;
-  }
+.modal-sheet {
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  padding: 8px 24px 40px;
+  width: 100%; max-width: 500px;
+  max-height: 90vh; 
+  overflow-y: auto;
+  overscroll-behavior-y: none; /* Stop pantulan di dalam modal */
+  -webkit-overflow-scrolling: touch;
+}
+
   .modal-handle {
     width: 36px; height: 4px;
     background: var(--gray-200); border-radius: 2px;
