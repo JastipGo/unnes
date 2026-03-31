@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>JastipUnnes</title>
+<title>JastipUnnes - Customer</title>
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
 <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <style>
+/* --- CSS UI UTAMA (TIDAK BERUBAH) --- */
 :root{--black:#000;--white:#FFF;--gray-100:#F6F6F6;--gray-200:#EBEBEB;--gray-300:#D4D4D4;--gray-400:#9A9A9A;--gray-500:#6B6B6B;--gray-600:#3D3D3D;--gray-700:#2A2A2A;--gray-800:#1A1A1A;--gray-900:#111;--green:#06C167;--green-dark:#048A48;--red:#EE2434;--amber:#F5A524;--font:'DM Sans',sans-serif;--radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-full:100px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--gray-100);color:var(--black);font-family:var(--font);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
@@ -121,24 +122,36 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 <audio id="sfx-create" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
 <audio id="sfx-ringtone" src="https://cdn.jsdelivr.net/gh/w3teal/awesome-ringtone/Sony/2013%20-%20Original.mp3" preload="auto"></audio>
 <audio id="sfx-complete" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" preload="auto"></audio>
+
 <div id="loading-overlay"><div class="spinner"></div><p id="loading-text">Memproses...</p></div>
+
 <div class="modal-overlay" id="info-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Informasi JastipUnnes</div><div class="modal-sub">JastipUnnes adalah layanan penyewaan jasa untuk 3 kategori:</div><ul class="info-list"><li><span class="material-symbols-outlined">storefront</span><div><strong>Jastip Resto/Toko</strong><br>Membelikan barang/makanan dan mengantarkannya.</div></li><li><span class="material-symbols-outlined">home_pin</span><div><strong>Ambil Instan</strong><br>Mengambil barang Anda yang sudah dibayar atau mengambil dari teman/keluarga.</div></li><li><span class="material-symbols-outlined">local_shipping</span><div><strong>Kirim Instan</strong><br>Mengirim barang dari Anda ke penerima yang ditentukan.</div></li></ul><div class="info-row"><span class="material-symbols-outlined">schedule</span><div class="info-row-text"><strong>Waktu Operasional:</strong> 05.00 - 21.00 WIB</div></div><div class="info-row"><span class="material-symbols-outlined">location_on</span><div class="info-row-text"><strong>Area Layanan:</strong> Semarang</div></div><div class="info-row"><span class="material-symbols-outlined">school</span><div class="info-row-text"><strong>Ketentuan Pengguna:</strong> Mahasiswa UNNES / Teman atau Keluarga Mahasiswa UNNES.</div></div><div style="margin-top:20px;"><button class="btn-primary" onclick="window.closeInfoModalAndFetchLoc()">Paham & Lanjutkan</button></div></div></div>
 
-<!-- MODAL PROFIL BARU -->
 <div class="modal-overlay" id="profile-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Profil Saya</div><div class="text-center" style="margin-bottom:20px;"><div class="avatar-big-wrap"><img id="prof-preview-img" src="" style="display:none;"><span id="prof-preview-text">U</span></div><input type="file" id="f-prof-pic" accept="image/*" style="display:none;" onchange="window.previewAvatar(event)"><button class="badge" style="background:var(--gray-100); color:var(--gray-600); border:1.5px solid var(--gray-200); cursor:pointer;" onclick="document.getElementById('f-prof-pic').click()">Ganti Foto</button></div><div style="background:var(--gray-100); border-radius:var(--radius-md); padding:16px; margin-bottom:16px; cursor:pointer;" onclick="window.openEditAccountModal()"><div style="display:flex; justify-content:space-between; align-items:center;"><div><div class="field-label" style="margin-bottom:4px;">Informasi Akun</div><div id="profile-name-display" style="font-weight:700; font-size:16px;">-</div><div id="profile-phone-display" style="font-size:13px; color:var(--gray-500);">-</div></div><span class="material-symbols-outlined">edit</span></div></div><button class="btn-secondary" onclick="window.openHelpWA()">Pusat Bantuan</button><button class="btn-primary" style="margin-top:12px;" onclick="window.closeProfileModal()">Tutup</button></div></div>
 
-<!-- MODAL EDIT AKUN -->
 <div class="modal-overlay" id="edit-account-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Edit Akun</div><div class="field-wrap"><label class="field-label">Nama Lengkap</label><input class="field" id="edit-name" type="text" placeholder="Nama Anda"></div><div class="field-wrap"><label class="field-label">Nomor WhatsApp</label><input class="field" id="edit-phone" type="number" placeholder="08xxxxxxxx"></div><button class="btn-primary" onclick="window.saveEditAccount()">Simpan</button><button class="btn-secondary" onclick="window.closeEditAccountModal()">Batal</button></div></div>
 
-<!-- MODAL TIBA (POPUP NOTIF) -->
-<div class="modal-overlay" id="arrival-modal"><div class="modal-sheet" style="text-align:center;"><div class="modal-handle"></div><div class="dancing-container" style="position:relative; display:block; margin:0 auto 16px; left:0; bottom:0;"><img src="https://media.tenor.com/b545_qP83O8AAAAj/dancing-chicken.gif" alt="Stiker"></div><div class="modal-title" style="font-size:24px;">🎉 Pesanan Tiba! 🎉</div><div class="modal-sub" style="font-size:18px; font-weight:700; color:var(--green);" id="arrival-fare-text">Rp 0</div><p style="margin:12px 0; font-size:16px;">Pesanan Anda telah sampai di tujuan. Siapkan uang sejumlah di atas untuk pembayaran kepada driver.</p><button class="btn-primary" id="arrival-ok-btn" onclick="window.confirmArrival()">OK, Saya Mengerti</button></div></div>
+<div class="modal-overlay" id="arrival-modal"><div class="modal-sheet" style="text-align:center;"><div class="modal-handle"></div><div class="dancing-container" style="position:relative; display:block; margin:0 auto 16px; left:0; bottom:0;"><img src="https://media.tenor.com/b545_qP83O8AAAAj/dancing-chicken.gif" alt="Stiker"></div><div class="modal-title" style="font-size:24px;">🎉 Pesanan Tiba! 🎉</div><div class="modal-sub" style="font-size:18px; font-weight:700; color:var(--green);" id="arrival-fare-text">Rp 0</div><p style="margin:12px 0; font-size:16px;">Driver telah tiba di lokasi pengantaran. Lakukan pembayaran jika diperlukan.</p><button class="btn-primary" id="arrival-ok-btn" onclick="window.confirmArrival()">OK, Saya Mengerti</button></div></div>
 
 <div class="modal-overlay" id="complete-profile-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Lengkapi Profil Anda</div><div class="modal-sub">Silakan lengkapi nama dan nomor WhatsApp Anda untuk dapat melanjutkan.</div><div class="field-wrap"><label class="field-label">Nama Lengkap <span class="field-required">*</span></label><input class="field" id="comp-name" type="text" placeholder="Nama Anda"></div><div class="field-wrap"><label class="field-label">Nomor WhatsApp <span class="field-required">*</span></label><input class="field" id="comp-phone" type="number" placeholder="08xxxxxxxx"></div><button class="btn-primary" onclick="window.saveCompleteProfile()">Simpan & Lanjutkan</button></div></div>
-<div class="modal-overlay" id="driver-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Info Driver</div><div class="text-center" style="margin-bottom:20px;"><div class="avatar-big-wrap" style="border:none;"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Driver"></div><h3 style="font-size: 18px; margin-bottom: 4px;">Budi Santoso</h3><div style="font-size: 13px; color: var(--gray-500); font-weight: 600; display:flex; align-items:center; justify-content:center; gap:4px;"><span class="material-symbols-outlined" style="color:#F5A524; font-size:18px;">shield</span> Terpercaya</div></div><div class="detail-grid"><div class="detail-row"><span class="detail-key">Nomor HP / WA</span><span class="detail-val">+62 851-3823-8914</span></div><div class="detail-row"><span class="detail-key">Bergabung Sejak</span><span class="detail-val">Agustus 2023</span></div><div class="detail-row"><span class="detail-key">Kendaraan</span><span class="detail-val">Honda Vario (H 1234 XX)</span></div></div><div style="margin-top:20px;"><button class="btn-primary" onclick="window.closeDriverModal()">Tutup</button></div></div></div>
+
+<div class="modal-overlay" id="driver-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Info Driver</div><div class="text-center" style="margin-bottom:20px;"><div class="avatar-big-wrap" style="border:none;"><img id="d-modal-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Driver"></div><h3 id="d-modal-name" style="font-size: 18px; margin-bottom: 4px;">-</h3><div id="d-modal-rank" style="font-size: 13px; color: var(--gray-500); font-weight: 600; display:flex; align-items:center; justify-content:center; gap:4px;"><span class="material-symbols-outlined" style="color:#F5A524; font-size:18px;">shield</span> -</div></div><div class="detail-grid"><div class="detail-row"><span class="detail-key">Nomor HP / WA</span><span class="detail-val" id="d-modal-wa">-</span></div><div class="detail-row"><span class="detail-key">Bergabung Sejak</span><span class="detail-val" id="d-modal-since">-</span></div><div class="detail-row"><span class="detail-key">Kendaraan</span><span class="detail-val" id="d-modal-kendaraan">-</span></div></div><div style="margin-top:20px;"><button class="btn-primary" onclick="window.closeDriverModal()">Tutup</button></div></div></div>
 
 <div id="splash"><div class="splash-hero"><div class="splash-wordmark">Jastip<span>Unnes</span></div><div class="splash-tagline">Sistem Manajemen Pengiriman & Titipan</div></div><div class="auth-sheet"><div class="auth-handle"></div><div class="auth-tabs"><div class="auth-tab active" id="tab-login" onclick="window.switchAuth('login')">Masuk</div><div class="auth-tab" id="tab-signup" onclick="window.switchAuth('signup')">Daftar</div></div><div id="auth-login-form"><div class="field-wrap"><input type="email" class="field" id="login-user" placeholder="Email" autocomplete="username"></div><div class="field-wrap"><input type="password" class="field" id="login-pass" placeholder="Password" autocomplete="current-password"></div><button class="btn-primary" onclick="window.doLogin()">Masuk</button></div><div id="auth-signup-form" class="d-none"><div class="field-wrap"><input type="text" class="field" id="signup-name" placeholder="Nama Lengkap"></div><div class="field-wrap"><input type="number" class="field" id="signup-phone" placeholder="Nomor WhatsApp"></div><div class="field-wrap"><input type="email" class="field" id="signup-email" placeholder="Email Baru"></div><div class="field-wrap"><input type="password" class="field" id="signup-pass" placeholder="Password (Min 6 karakter)"></div><button class="btn-primary" onclick="window.doSignup()">Daftar Akun</button></div><div class="or-divider">ATAU</div><button class="btn-primary btn-google" onclick="window.doGoogleAuth()"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Lanjutkan dengan Google</button></div></div>
 
-<div id="app"><div class="top-bar"><div class="top-bar-brand">Jastip<span>Unnes</span></div><div class="top-bar-actions"><div class="avatar" id="user-avatar" onclick="window.openProfileModal()" title="Profil">U</div><button class="icon-btn" onclick="window.doLogout()" title="Keluar"><span class="material-symbols-outlined">logout</span></button></div></div><div class="content"><div class="page active" id="page-upload"><div class="page-header"><div class="page-title">Buat Pesanan</div><div class="page-sub">Pilih layanan dan isi detail pesanan</div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">category</span> Kategori Layanan</div><div class="chips-wrap" id="type-chips"><div class="chip selected" onclick="window.selectType(this,'Jastip resto/toko')">Jastip resto/toko</div><div class="chip" onclick="window.selectType(this,'Ambil Instan')">Ambil Instan</div><div class="chip" onclick="window.selectType(this,'Kirim Instan')">Kirim Instan</div></div><div id="notice-container" class="notice-card"><strong>Pemberitahuan:</strong> Di awal perlu TF untuk beli barang/makanannya, ongkos dibayar setelah sampai (Cash/TF). COD sepenuhnya jika sudah pernah memesan layanan minimal 1x.</div></div><div class="card"><div class="card-title"><span id="icon-pickup" class="material-symbols-outlined">storefront</span> <span id="label-pickup-title">Lokasi Pengambilan</span> <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-pickup">Link Maps <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-pickup-loc" type="text" placeholder="Masukkan Link Maps..." data-valid="true"><button class="btn-primary" id="btn-pickup-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary d-none" id="btn-pickup-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-pickup-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-pickup-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-pickup-detail" type="text" placeholder="Detail Toko / Lokasi Pengambilan"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">home_pin</span> Lokasi Pengiriman <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-delivery">Titik Koordinat <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-delivery-loc" type="text" placeholder="Tekan tombol GPS disamping..." readonly data-valid="true"><button class="btn-primary d-none" id="btn-delivery-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary" id="btn-delivery-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-delivery-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-delivery-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-delivery-detail" type="text" placeholder="Detail Alamat Pengiriman"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">notes</span> Catatan & Waktu</div><div class="field-wrap"><label class="field-label">Catatan Pesanan <span class="field-required">*</span></label><textarea class="field" id="f-catatan" rows="2" placeholder="Cth: Tolong letakkan di teras..."></textarea></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Waktu Pengambilan</label><div class="waktu-btns"><button class="btn-waktu active" id="btn-langsung" onclick="window.setWaktu('Langsung')">Langsung</button><button class="btn-waktu" id="btn-jadwal" onclick="window.setWaktu('Jadwalkan')">Jadwalkan</button></div><input type="datetime-local" class="field d-none" id="f-waktu-jadwal"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">person</span> Data Kontak <span class="field-required">*</span></div><div id="container-penerima"><div class="field-wrap"><label class="field-label">Nama Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-nama" type="text" placeholder="Nama Penerima Barang"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-wa" type="number" placeholder="08xxxxxxxx"></div></div><div id="container-pengirim" class="d-none"><div class="field-wrap"><label class="field-label">Nama Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-nama" type="text" placeholder="Nama Anda (Pengirim)"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-wa" type="number" placeholder="08xxxxxxxx"></div></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">payments</span> Tarif & Jarak</div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Jarak Tempuh (KM) <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-distance" type="number" step="0.1" min="0" placeholder="0.0" oninput="window.calculateArgoManual()"><button class="btn-primary" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button></div></div><div class="fare-display" style="margin-top:14px;"><div><div class="fare-label">Total Argo / Tarif</div></div><strong id="display-fare" class="fare-amount">Rp 0</strong></div></div><div class="submit-area"><button class="btn-primary" id="btn-upload" onclick="window.doUpload()" style="font-size:16px;"><span class="material-symbols-outlined">bolt</span> Buat Pesanan</button></div></div><div class="page" id="page-proses"><div class="page-header"><div class="page-title">Pesanan Diproses</div><div class="page-sub">Pesanan aktif kamu</div></div><div id="proses-results"></div></div><div class="page" id="page-archive"><div class="page-header"><div class="page-title">Riwayat Selesai</div><div class="page-sub">Pesanan yang sudah selesai atau dibatalkan</div></div><div class="search-bar"><span class="material-symbols-outlined" style="color:var(--gray-400); font-size:20px;">search</span><input type="text" id="search-input" placeholder="Cari nama..." oninput="window.onSearch()"><button class="search-clear" id="search-clear" onclick="window.clearSearch()"><span class="material-symbols-outlined" style="font-size:20px;">close</span></button></div><div id="archive-results"></div></div></div><div class="bottom-nav"><button class="nav-item active" id="nav-upload" onclick="window.switchPage('upload')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">add_box</span><span class="label">Buat Pesanan</span></button><button class="nav-item" id="nav-proses" onclick="window.switchPage('proses')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">hourglass_top</span><span class="label">Proses</span></button><button class="nav-item" id="nav-archive" onclick="window.switchPage('archive')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">history</span><span class="label">Riwayat</span></button></div></div>
+<div id="app">
+<div class="top-bar"><div class="top-bar-brand">Jastip<span>Unnes</span></div><div class="top-bar-actions"><div class="avatar" id="user-avatar" onclick="window.openProfileModal()" title="Profil">U</div><button class="icon-btn" onclick="window.doLogout()" title="Keluar"><span class="material-symbols-outlined">logout</span></button></div></div>
+<div class="content">
+
+<div class="page active" id="page-upload"><div class="page-header"><div class="page-title">Buat Pesanan</div><div class="page-sub">Pilih layanan dan isi detail pesanan</div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">category</span> Kategori Layanan</div><div class="chips-wrap" id="type-chips"><div class="chip selected" onclick="window.selectType(this,'Jastip resto/toko')">Jastip resto/toko</div><div class="chip" onclick="window.selectType(this,'Ambil Instan')">Ambil Instan</div><div class="chip" onclick="window.selectType(this,'Kirim Instan')">Kirim Instan</div></div><div id="notice-container" class="notice-card"><strong>Pemberitahuan:</strong> Pembayaran awal via transfer, ongkir dibayar setelah sampai.</div></div><div class="card"><div class="card-title"><span id="icon-pickup" class="material-symbols-outlined">storefront</span> <span id="label-pickup-title">Lokasi Pengambilan</span> <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-pickup">Link Maps <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-pickup-loc" type="text" placeholder="Masukkan Link Maps..." data-valid="true"><button class="btn-primary" id="btn-pickup-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary d-none" id="btn-pickup-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-pickup-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-pickup-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-pickup-detail" type="text" placeholder="Detail Toko / Lokasi Pengambilan"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">home_pin</span> Lokasi Pengiriman <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-delivery">Titik Koordinat <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-delivery-loc" type="text" placeholder="Tekan tombol GPS disamping..." readonly data-valid="true"><button class="btn-primary d-none" id="btn-delivery-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary" id="btn-delivery-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-delivery-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-delivery-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-delivery-detail" type="text" placeholder="Detail Alamat Pengiriman"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">notes</span> Catatan & Waktu</div><div class="field-wrap"><label class="field-label">Catatan Pesanan <span class="field-required">*</span></label><textarea class="field" id="f-catatan" rows="2" placeholder="Cth: Tolong letakkan di teras..."></textarea></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Waktu Pengambilan</label><div class="waktu-btns"><button class="btn-waktu active" id="btn-langsung" onclick="window.setWaktu('Langsung')">Langsung</button><button class="btn-waktu" id="btn-jadwal" onclick="window.setWaktu('Jadwalkan')">Jadwalkan</button></div><input type="datetime-local" class="field d-none" id="f-waktu-jadwal"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">person</span> Data Kontak <span class="field-required">*</span></div><div id="container-penerima"><div class="field-wrap"><label class="field-label">Nama Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-nama" type="text" placeholder="Nama Penerima Barang"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-wa" type="number" placeholder="08xxxxxxxx"></div></div><div id="container-pengirim" class="d-none"><div class="field-wrap"><label class="field-label">Nama Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-nama" type="text" placeholder="Nama Anda (Pengirim)"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-wa" type="number" placeholder="08xxxxxxxx"></div></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">payments</span> Tarif & Jarak</div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Jarak Tempuh (KM) <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-distance" type="number" step="0.1" min="0" placeholder="0.0" oninput="window.calculateArgoManual()"><button class="btn-primary" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button></div></div><div class="fare-display" style="margin-top:14px;"><div><div class="fare-label">Total Argo / Tarif</div></div><strong id="display-fare" class="fare-amount">Rp 0</strong></div></div><div class="submit-area"><button class="btn-primary" id="btn-upload" onclick="window.doUpload()" style="font-size:16px;"><span class="material-symbols-outlined">bolt</span> Buat Pesanan</button></div></div>
+
+<div class="page" id="page-proses"><div class="page-header"><div class="page-title">Pesanan Diproses</div><div class="page-sub">Pantau pesanan aktif kamu</div></div><div id="proses-results"></div></div>
+
+<div class="page" id="page-archive"><div class="page-header"><div class="page-title">Riwayat Selesai</div><div class="page-sub">Pesanan yang sudah selesai atau dibatalkan</div></div><div class="search-bar"><span class="material-symbols-outlined" style="color:var(--gray-400); font-size:20px;">search</span><input type="text" id="search-input" placeholder="Cari nama..." oninput="window.onSearch()"><button class="search-clear" id="search-clear" onclick="window.clearSearch()"><span class="material-symbols-outlined" style="font-size:20px;">close</span></button></div><div id="archive-results"></div></div>
+</div>
+
+<div class="bottom-nav"><button class="nav-item active" id="nav-upload" onclick="window.switchPage('upload')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">add_box</span><span class="label">Buat Pesanan</span></button><button class="nav-item" id="nav-proses" onclick="window.switchPage('proses')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">hourglass_top</span><span class="label">Proses</span></button><button class="nav-item" id="nav-archive" onclick="window.switchPage('archive')"><div class="nav-active-dot"></div><span class="material-symbols-outlined">history</span><span class="label">Riwayat</span></button></div></div>
+
 <div id="dancing-container" class="dancing-container"><img src="https://media.tenor.com/b545_qP83O8AAAAj/dancing-chicken.gif" alt="Dancing Chicken"></div>
 <div id="toast"><span id="toast-msg">OK</span></div>
 
@@ -146,12 +159,26 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,onAuthStateChanged,GoogleAuthProvider,signInWithPopup}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import{getFirestore,collection,addDoc,query,where,doc,setDoc,getDoc,updateDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 const app=initializeApp({apiKey:"AIzaSyDeAIeJYabLqzX8_lwBkDZE98EOc3-9lYY",authDomain:"arsipmrikanasin.firebaseapp.com",projectId:"arsipmrikanasin",storageBucket:"arsipmrikanasin.firebasestorage.app",messagingSenderId:"789371282298",appId:"1:789371282298:web:edc61d7bc00935fc22ecc3"});
 const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({client_id:'789371282298-jju2gdn42r0s8n2sr1h241r9lb1ogqnp.apps.googleusercontent.com'});
-let currentUserUid='',currentUserEmail='',currentUserData=null;let selectedType='Jastip resto/toko';window.localPendingOrders=[];window.activeOrdersData=[];window.historyOrdersData=[];
-let unsubscribeOrders=null,diprosesSet=new Set();window.currentOrderDist=null;window.currentOrderFare=null;window.tempAvatarData=null;window.isRegistering=false;window.waktuType='Langsung';
-window.mapCenters={};window.mapInstances={};window.arrivalRingInterval=null;window.currentArrivalOrderId=null;
 
+let currentUserUid='',currentUserEmail='',currentUserData=null;
+let selectedType='Jastip resto/toko';
+window.activeOrdersData=[];
+window.historyOrdersData=[];
+let unsubscribeOrders=null, diprosesSet=new Set();
+window.currentOrderDist=null;
+window.currentOrderFare=null;
+window.isRegistering=false;
+window.waktuType='Langsung';
+window.mapInstances={};
+window.mapCenters={};
+window.arrivalRingInterval=null;
+window.currentArrivalOrderId=null;
+window.currentDriverMarkers={};
+
+/* UI & UX Handlers */
 if(window.visualViewport){
   let initVwHeight=window.visualViewport.height;
   window.visualViewport.addEventListener('resize',()=>{
@@ -161,69 +188,576 @@ if(window.visualViewport){
   });
 }
 document.addEventListener('contextmenu',e=>{if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
-document.addEventListener('copy',e=>{if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
-document.addEventListener('cut',e=>{if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
 document.addEventListener('click',e=>{if(e.target.closest('.chip,.nav-item,.auth-tab,.order-card-header,.btn-primary,.btn-secondary,.btn-green,.icon-btn,.btn-waktu,.driver-card')||e.target.tagName==='BUTTON'||e.target.tagName==='A'){const a=document.getElementById('sfx-click');if(a){a.currentTime=0;a.play().catch(()=>{});}}});
+
 function showLoading(t){document.getElementById('loading-text').textContent=t;document.getElementById('loading-overlay').classList.add('visible');}
 function hideLoading(){document.getElementById('loading-overlay').classList.remove('visible');}
-onAuthStateChanged(auth,async(user)=>{if(user){currentUserUid=user.uid;currentUserEmail=user.email;if(!window.isRegistering)await checkUserProfile(user);}else{currentUserUid='';if(unsubscribeOrders)unsubscribeOrders();document.getElementById('app').classList.remove('visible');document.getElementById('splash').classList.remove('hidden');}});
-async function checkUserProfile(user){
-  try{const snap=await getDoc(doc(db,"users",user.uid));if(snap.exists()&&snap.data().phone){currentUserData=snap.data();updateUserAvatarUI(currentUserData);document.getElementById('f-penerima-nama').value=currentUserData.name||'';document.getElementById('f-penerima-wa').value=currentUserData.phone||'';document.getElementById('f-pengirim-nama').value=currentUserData.name||'';document.getElementById('f-pengirim-wa').value=currentUserData.phone||'';document.getElementById('splash').classList.add('hidden');document.getElementById('complete-profile-modal').classList.remove('open');document.getElementById('app').classList.add('visible');subscribeOrders();document.getElementById('info-modal').classList.add('open');}else{document.getElementById('complete-profile-modal').classList.add('open');}}catch(e){showToast('Gagal memuat profil');}
-}
-function updateUserAvatarUI(d){const a=document.getElementById('user-avatar');if(d.avatar&&d.avatar.trim()!=="")a.innerHTML=`<img src="${d.avatar}" alt="PFP">`;else a.innerHTML=d.name?d.name[0].toUpperCase():'U';}
-window.switchAuth=m=>{document.querySelectorAll('.auth-tab').forEach(e=>e.classList.remove('active'));document.getElementById('auth-login-form').classList.add('d-none');document.getElementById('auth-signup-form').classList.add('d-none');document.getElementById('tab-'+m).classList.add('active');document.getElementById('auth-'+m+'-form').classList.remove('d-none');};
-window.doLogin=async()=>{const e=document.getElementById('login-user').value.trim(),p=document.getElementById('login-pass').value.trim();if(!e||!p)return showToast('Isi email & password');showLoading('Login...');try{await signInWithEmailAndPassword(auth,e,p);showToast('Login Berhasil');}catch(er){showToast('Gagal: '+er.message);}finally{hideLoading();}};
-window.doSignup=async()=>{const n=document.getElementById('signup-name').value.trim(),ph=document.getElementById('signup-phone').value.trim(),e=document.getElementById('signup-email').value.trim(),p=document.getElementById('signup-pass').value.trim();if(!n||!ph||!e||!p)return showToast('Lengkapi data');if(p.length<6)return showToast('Password min 6');showLoading('Mendaftar...');window.isRegistering=true;try{const c=await createUserWithEmailAndPassword(auth,e,p);await setDoc(doc(db,"users",c.user.uid),{name:n,phone:ph,email:e,avatar:''});window.isRegistering=false;await checkUserProfile(c.user);showToast('Berhasil');}catch(er){window.isRegistering=false;showToast('Gagal: '+er.message);}finally{hideLoading();}};
-window.doGoogleAuth=async()=>{try{showLoading('Membuka Google...');await signInWithPopup(auth,googleProvider);}catch(e){if(e.code!=='auth/popup-closed-by-user')showToast('Gagal: '+e.message);}finally{hideLoading();}};
-window.saveCompleteProfile=async()=>{const n=document.getElementById('comp-name').value.trim(),ph=document.getElementById('comp-phone').value.trim();if(!n||!ph)return showToast("Isi nama & WA");showLoading("Menyimpan...");try{await setDoc(doc(db,"users",currentUserUid),{name:n,phone:ph,email:currentUserEmail,avatar:''},{merge:true});document.getElementById('complete-profile-modal').classList.remove('open');await checkUserProfile(auth.currentUser);showToast('Profil dilengkapi');}catch(e){showToast(e.message);}finally{hideLoading();}};
-window.openProfileModal=()=>{if(!currentUserData)return;document.getElementById('prof-preview-img').style.display=currentUserData.avatar?'block':'none';document.getElementById('prof-preview-text').style.display=currentUserData.avatar?'none':'block';if(currentUserData.avatar)document.getElementById('prof-preview-img').src=currentUserData.avatar;else document.getElementById('prof-preview-text').innerText=currentUserData.name?currentUserData.name[0].toUpperCase():'U';document.getElementById('profile-name-display').innerText=currentUserData.name||'-';document.getElementById('profile-phone-display').innerText=currentUserData.phone||'-';document.getElementById('profile-modal').classList.add('open');};
-window.closeProfileModal=()=>document.getElementById('profile-modal').classList.remove('open');
-window.openEditAccountModal=()=>{document.getElementById('edit-name').value=currentUserData.name||'';document.getElementById('edit-phone').value=currentUserData.phone||'';document.getElementById('edit-account-modal').classList.add('open');};
-window.closeEditAccountModal=()=>document.getElementById('edit-account-modal').classList.remove('open');
-window.saveEditAccount=async()=>{const n=document.getElementById('edit-name').value.trim(),p=document.getElementById('edit-phone').value.trim();if(!n||!p)return showToast('Nama dan nomor WA wajib diisi');showLoading('Menyimpan...');try{await updateDoc(doc(db,"users",currentUserUid),{name:n,phone:p});currentUserData.name=n;currentUserData.phone=p;updateUserAvatarUI(currentUserData);document.getElementById('profile-name-display').innerText=n;document.getElementById('profile-phone-display').innerText=p;window.closeEditAccountModal();showToast('Akun diperbarui');}catch(e){showToast('Gagal update');}finally{hideLoading();}};
-window.openHelpWA=()=>{window.open('https://wa.me/6285138238914','_blank');};
-window.previewAvatar=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{const imgData=ev.target.result;document.getElementById('prof-preview-img').src=imgData;document.getElementById('prof-preview-img').style.display='block';document.getElementById('prof-preview-text').style.display='none';showLoading('Upload foto...');try{await updateDoc(doc(db,"users",currentUserUid),{avatar:imgData});currentUserData.avatar=imgData;updateUserAvatarUI(currentUserData);showToast('Foto berhasil');}catch(e){showToast('Gagal upload');}finally{hideLoading();}};r.readAsDataURL(f);};
-window.doLogout=()=>{signOut(auth);document.getElementById('login-user').value='';document.getElementById('login-pass').value='';currentUserData=null;};
-window.closeInfoModalAndFetchLoc=()=>{document.getElementById('info-modal').classList.remove('open');if(selectedType==='Kirim Instan')window.getLocation('f-pickup-loc');else window.getLocation('f-delivery-loc');};
-window.switchPage=p=>{document.querySelectorAll('.page,.nav-item').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.getElementById('nav-'+p).classList.add('active');if(p==='proses')window.renderProses();if(p==='archive')window.renderArchive();};
-window.selectType=(el,t)=>{document.querySelectorAll('#type-chips .chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedType=t;const nt=document.getElementById('notice-container'),ic=document.getElementById('icon-pickup'),fP=document.getElementById('f-pickup-loc'),bP=document.getElementById('btn-pickup-maps'),bPG=document.getElementById('btn-pickup-gps'),fD=document.getElementById('f-delivery-loc'),bD=document.getElementById('btn-delivery-maps'),bDG=document.getElementById('btn-delivery-gps'),cP=document.getElementById('container-penerima'),cPg=document.getElementById('container-pengirim');fP.value='';fD.value='';fP.dataset.valid="true";fD.dataset.valid="true";document.getElementById('f-pickup-loc-accuracy').classList.add('d-none');document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');if(t==='Jastip resto/toko'){ic.textContent='storefront';nt.innerHTML='<strong>Pemberitahuan:</strong> Pembayaran hanya TF untuk beli, ongkos dibayar COD/TF. COD 100% jika pernah pesan minimal 1x.';document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>';fP.readOnly=false;fP.placeholder="Masukkan Link Maps...";bP.classList.remove('d-none');bPG.classList.add('d-none');document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>';fD.readOnly=true;fD.placeholder="Tekan GPS...";bD.classList.add('d-none');bDG.classList.remove('d-none');cP.classList.remove('d-none');cPg.classList.add('d-none');window.getLocation('f-delivery-loc');}else if(t==='Ambil Instan'){ic.textContent='home_pin';nt.innerHTML='<strong>Pemberitahuan:</strong> Max 15 kg, PxLxT: 50x50x60 cm.';document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>';fP.readOnly=false;fP.placeholder="Masukkan Link Maps...";bP.classList.remove('d-none');bPG.classList.add('d-none');document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>';fD.readOnly=true;fD.placeholder="Tekan GPS...";bD.classList.add('d-none');bDG.classList.remove('d-none');cP.classList.remove('d-none');cPg.classList.add('d-none');window.getLocation('f-delivery-loc');}else{ic.textContent='storefront';nt.innerHTML='<strong>Pemberitahuan:</strong> Max 15 kg, PxLxT: 50x50x60 cm.';document.getElementById('label-pickup').innerHTML='Titik Koordinat <span class="field-required">*</span>';fP.readOnly=true;fP.placeholder="Tekan GPS...";bP.classList.add('d-none');bPG.classList.remove('d-none');document.getElementById('label-delivery').innerHTML='Link Maps <span class="field-required">*</span>';fD.readOnly=false;fD.placeholder="Masukkan Link Maps...";bD.classList.remove('d-none');bDG.classList.add('d-none');cP.classList.add('d-none');cPg.classList.remove('d-none');window.getLocation('f-pickup-loc');}};
-window.setWaktu=w=>{window.waktuType=w;document.getElementById('btn-langsung').classList.toggle('active',w==='Langsung');document.getElementById('btn-jadwal').classList.toggle('active',w==='Jadwalkan');document.getElementById('f-waktu-jadwal').classList.toggle('d-none',w==='Langsung');};
-window.openGoogleMaps=()=>window.open('https://maps.google.com/','_blank');
-window.getLocation=id=>{if(!navigator.geolocation)return showToast('GPS tak didukung');showToast('Mencari lokasi...');navigator.geolocation.getCurrentPosition(p=>{let ac=p.coords.accuracy,st='',c='',v=false;if(ac<=15){st='Sangat Tinggi';c='var(--green-dark)';v=true;}else if(ac<=50){st='Tinggi';c='var(--green)';v=true;}else if(ac<=150){st='Sedang';c='var(--amber)';v=false;}else{st='Lemah';c='var(--red)';v=false;}let i=document.getElementById(id);i.value=`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;i.dataset.valid=v;let aDiv=document.getElementById(id+'-accuracy');if(aDiv){aDiv.innerHTML=`Akurasi GPS: <strong style="color:${c}">${st}</strong> (±${Math.round(ac)}m)`;aDiv.classList.remove('d-none');}showToast(!v?'Akurasi lemah, coba lagi':'Lokasi didapatkan');},()=>showToast('Gagal akses GPS'),{enableHighAccuracy:true,timeout:15000,maximumAge:0});};
-window.calculateArgoManual=()=>{let d=parseFloat(document.getElementById('f-distance').value);if(!isNaN(d)&&d>0){let f=0;if(selectedType==='Jastip resto/toko'){if(d<=1)f=6000;else if(d<=2)f=8000;else if(d<=3)f=8000+(Math.ceil((d-2)*20)*100);else if(d<=4)f=10000+(Math.ceil((d-3)*20)*100);else if(d<=5)f=12000+(Math.ceil((d-4)*20)*200);else f=12000+(Math.ceil((d-5)*20)*130);}else{if(d<=1)f=4300;else if(d<=2)f=4300+(Math.ceil((d-1)*20)*85);else if(d<=3)f=6000+(Math.ceil((d-2)*20)*50);else if(d<=4)f=7000+(Math.ceil((d-3)*20)*150);else if(d<=5)f=10000+(Math.ceil((d-4)*20)*100);else f=12000+(Math.ceil((d-5)*20)*125);}window.currentOrderDist=d;window.currentOrderFare=Math.round(f);document.getElementById('display-fare').textContent='Rp '+window.currentOrderFare.toLocaleString('id-ID');}else{window.currentOrderDist=null;window.currentOrderFare=null;document.getElementById('display-fare').textContent='Rp 0';}};
-function exC(str){let m=str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);return m?[parseFloat(m[2]),parseFloat(m[1])]:null;}
-window.doUpload=async()=>{let gi=document.getElementById(selectedType==='Kirim Instan'?'f-pickup-loc':'f-delivery-loc');if(gi.dataset.valid==="false")return showToast('GPS lemah');let pL=document.getElementById('f-pickup-loc').value.trim(),pD=document.getElementById('f-pickup-detail').value.trim(),dL=document.getElementById('f-delivery-loc').value.trim(),dDe=document.getElementById('f-delivery-detail').value.trim(),c=document.getElementById('f-catatan').value.trim(),wj=document.getElementById('f-waktu-jadwal').value;let cn=document.getElementById(selectedType==='Kirim Instan'?'f-pengirim-nama':'f-penerima-nama').value.trim(),cw=document.getElementById(selectedType==='Kirim Instan'?'f-pengirim-wa':'f-penerima-wa').value.trim();if(!pL||!pD||!dL||!dDe||!c||!cn||!cw||window.currentOrderFare===null)return showToast('Lengkapi data wajib (*)');if(window.waktuType==='Jadwalkan'&&!wj)return showToast('Atur waktu jadwal');const li='temp-'+Date.now();window.localPendingOrders.push({id:li,orderNo:"JSTP-"+Date.now().toString().slice(-6),type:selectedType,pickupAddress:pL,pickupDetail:pD,deliveryAddress:dL,deliveryDetail:dDe,catatan:c,waktuTipe:window.waktuType,waktuJadwal:wj,contactName:cn,contactWA:cw,distanceKm:window.currentOrderDist,fare:window.currentOrderFare,uploadedAt:new Date().toISOString(),uploader:currentUserUid,status:'local_pending',pendingUntil:Date.now()+20000});document.getElementById('sfx-create').play().catch(()=>{});['f-pickup-loc','f-pickup-detail','f-delivery-loc','f-delivery-detail','f-catatan','f-waktu-jadwal','f-penerima-nama','f-penerima-wa','f-pengirim-nama','f-pengirim-wa','f-distance'].forEach(i=>{if(document.getElementById(i))document.getElementById(i).value='';});window.currentOrderDist=null;window.currentOrderFare=null;document.getElementById('display-fare').textContent='Rp 0';document.getElementById('f-pickup-loc-accuracy').classList.add('d-none');document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');gi.dataset.valid="true";window.setWaktu('Langsung');window.switchPage('proses');showToast('Diproses...');setTimeout(async()=>{const ix=window.localPendingOrders.findIndex(o=>o.id===li);if(ix!==-1){const ou={...window.localPendingOrders[ix]};delete ou.id;ou.status='menunggu';ou.uploadedAt=new Date().toISOString();window.localPendingOrders.splice(ix,1);try{const ref=await addDoc(collection(db,"orders"),ou);setTimeout(()=>{getDoc(ref).then(s=>{if(s.exists()&&s.data().status==='menunggu')updateDoc(ref,{status:'diproses'});});},10000);}catch(e){showToast('Gagal simpan');}}},20000);};
-function subscribeOrders(){if(unsubscribeOrders)unsubscribeOrders();if(!currentUserUid)return;unsubscribeOrders=onSnapshot(query(collection(db,"orders"),where("uploader","==",currentUserUid)),s=>{let a=[];s.forEach(d=>a.push({id:d.id,...d.data()}));a.sort((x,y)=>new Date(y.uploadedAt||0)-new Date(x.uploadedAt||0));window.activeOrdersData=a.filter(o=>o.status!=='selesai'&&o.status!=='dibatalkan');window.historyOrdersData=a.filter(o=>o.status==='selesai'||o.status==='dibatalkan');window.activeOrdersData.forEach(o=>{if(o.status==='diproses'&&!diprosesSet.has(o.id)){diprosesSet.add(o.id);const sfx=document.getElementById('sfx-ringtone');if(sfx){sfx.currentTime=0;sfx.play().catch(()=>{});}}else if(o.status!=='diproses')diprosesSet.delete(o.id);});if(document.getElementById('page-proses').classList.contains('active'))window.renderProses();if(document.getElementById('page-archive').classList.contains('active'))window.renderArchive();});}
-window.toggleDetail=id=>{let d=document.getElementById('detail-'+id),i=document.getElementById('icon-expand-'+id);if(d.classList.contains('d-none')){d.classList.remove('d-none');i.textContent='expand_less';setTimeout(()=>window.dispatchEvent(new Event('resize')),100);}else{d.classList.add('d-none');i.textContent='expand_more';}};
-window.ingatkanDriver=id=>{let o=[...window.localPendingOrders,...window.activeOrdersData].find(x=>x.id===id);if(!o)return;window.open('https://wa.me/6285138238914?text='+encodeURIComponent(`*Halo!*\nKategori: ${o.type}\nAmbil: ${o.pickupDetail}\nAntar: ${o.deliveryDetail}\nCatatan: ${o.catatan||'-'}\nArgo: Rp ${(o.fare||0).toLocaleString('id-ID')}`),'_blank');};
-window.batalOrder=async id=>{if(!confirm('Yakin batalkan?'))return;showLoading('Membatalkan...');if(id.startsWith('temp-')){window.localPendingOrders=window.localPendingOrders.filter(o=>o.id!==id);window.renderProses();hideLoading();showToast('Dibatalkan');return;}try{await updateDoc(doc(db,"orders",id),{status:'dibatalkan'});showToast('Dibatalkan');}catch(e){showToast('Gagal');}finally{hideLoading();}};
-window.showArrivalPopup=(orderId,fare)=>{if(window.arrivalRingInterval)clearInterval(window.arrivalRingInterval);window.currentArrivalOrderId=orderId;document.getElementById('arrival-fare-text').innerHTML=`Rp ${fare.toLocaleString('id-ID')}`;const modal=document.getElementById('arrival-modal');modal.classList.add('open');const ringtone=document.getElementById('sfx-ringtone');ringtone.loop=true;ringtone.play().catch(()=>{});window.arrivalRingInterval=setInterval(()=>{if(ringtone.paused)ringtone.play().catch(()=>{});},3000);};
-window.confirmArrival=async()=>{if(window.arrivalRingInterval){clearInterval(window.arrivalRingInterval);window.arrivalRingInterval=null;}const ringtone=document.getElementById('sfx-ringtone');ringtone.loop=false;ringtone.pause();ringtone.currentTime=0;document.getElementById('arrival-modal').classList.remove('open');if(window.currentArrivalOrderId){try{await updateDoc(doc(db,"orders",window.currentArrivalOrderId),{status:'selesai'});showToast('Pesanan selesai');window.renderProses();}catch(e){showToast('Gagal update');}}window.currentArrivalOrderId=null;};
-window.selesaiOrder=async id=>{ // function ini tidak dipakai lagi, namun biarkan untuk kompatibilitas
-  const order=window.activeOrdersData.find(o=>o.id===id);
-  if(order&&order.status==='diproses'){window.showArrivalPopup(id,order.fare);}
-};
-window.renderProses=()=>{const c=document.getElementById('proses-results'),g=document.getElementById('dancing-container'),all=[...window.localPendingOrders,...window.activeOrdersData];if(!all.length){c.innerHTML=`<div class="empty-state"><span class="material-symbols-outlined">inbox</span><p>Kosong.</p></div>`;g.style.display='none';return;}g.style.display='block';let h='';all.forEach(o=>{let l=o.status==='local_pending',m=o.status==='menunggu',d=o.status==='diproses',s=o.status==='selesai';let step1='',step2='',step3='',step4='';if(m){step1='active';step2='';step3='';step4='';}else if(d){step1='done';step2='done';step3='active';step4='';}else if(s){step1='done';step2='done';step3='done';step4='active';}let fillWidth=0;if(m)fillWidth='15%';else if(d)fillWidth='65%';else if(s)fillWidth='100%';h+=`<div class="order-card" id="card-${o.id}"><div class="order-card-header" onclick="window.toggleDetail('${o.id}')"><div><div class="order-card-num">${o.orderNo}</div><div class="order-card-type">${o.type}</div></div><div class="order-card-right">${!l?`<div class="order-timer-pill order-timer" data-time="${o.uploadedAt}">00:00</div>`:''}${d?`<div class="est-pill">Est: 30 Min</div>`:''}</div></div><div class="order-card-body"><div class="timeline-uber"><div class="tl-track"><div class="tl-fill" style="width:${fillWidth};"></div></div><div class="tl-step ${step1}"><div class="tl-dot"><span class="material-symbols-outlined">search</span></div><div class="tl-label">Mencari</div></div><div class="tl-step ${step2}"><div class="tl-dot"><span class="material-symbols-outlined">shopping_bag</span></div><div class="tl-label">Ambil</div></div><div class="tl-step ${step3}"><div class="tl-dot"><span class="material-symbols-outlined">two_wheeler</span></div><div class="tl-label">Ngantar</div></div><div class="tl-step ${step4}"><div class="tl-dot"><span class="material-symbols-outlined">flag</span></div><div class="tl-label">Tiba</div></div></div>${l?`<div style="text-align:center;padding:14px 0;"><div class="spinner-amber" style="margin:0 auto 10px;"></div><div style="font-size:14px;font-weight:600;color:var(--amber);margin-bottom:14px;">Membuat Pesanan... (<span class="pending-timer" data-until="${o.pendingUntil}">20</span>s)</div><button class="btn-secondary" style="border-color:var(--red);color:var(--red);padding:12px;margin:0;" onclick="window.batalOrder('${o.id}')">Batalkan</button></div>`:``}<button class="toggle-detail-btn" onclick="window.toggleDetail('${o.id}')" style="margin-top:${l?'10px':'0'};"><span id="icon-expand-${o.id}" class="material-symbols-outlined" style="font-size:18px;">expand_more</span> Detail</button></div><div id="detail-${o.id}" class="order-detail-panel d-none">${d?`<div class="driver-card" onclick="window.showDriverModal()"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Driver"><div class="driver-info"><div class="driver-name">Budi Santoso</div><div class="driver-rating" style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="color:#F5A524;font-size:14px;">shield</span> Terpercaya</div></div><span class="material-symbols-outlined" style="color:var(--gray-400)">chevron_right</span></div><div id="map-container-${o.id}" style="height:180px;width:100%;border-radius:8px;margin-bottom:14px;border:1px solid var(--gray-200);position:relative;overflow:hidden;"><button onclick="window.mapCenters['${o.id}']()" style="position:absolute;bottom:10px;right:10px;z-index:10;width:36px;height:36px;border-radius:50%;background:#FFF;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;"><span class="material-symbols-outlined" style="font-size:20px;color:#202124;">zoom_in</span></button></div>`:''}<div class="detail-grid"><div class="detail-row"><span class="detail-key">Argo</span><span class="detail-val" style="color:var(--green);font-size:16px;">Rp ${(o.fare||0).toLocaleString('id-ID')}</span></div><div class="detail-row"><span class="detail-key">Kontak</span><span class="detail-val">${o.contactName}</span></div><div class="detail-row"><span class="detail-key">Ambil</span><span class="detail-val">${o.pickupDetail||o.pickupAddress}</span></div><div class="detail-row"><span class="detail-key">Antar</span><span class="detail-val">${o.deliveryDetail||o.deliveryAddress}</span></div></div><div class="action-btns-grid">${m?`<button class="btn-green" onclick="window.ingatkanDriver('${o.id}')">Ingatkan Driver (WA)</button>`:''}${d?`<button class="btn-primary" onclick="window.selesaiOrder('${o.id}')">Pesanan Tiba</button>`:''}</div></div></div>`;});c.innerHTML=h;window.updateTimers();setTimeout(()=>{all.forEach(o=>{if(o.status==='diproses'){let mEl=document.getElementById('map-container-'+o.id);if(mEl&&!mEl.dataset.initialized){mEl.dataset.initialized="true";let ds=exC(o.deliveryAddress)||exC(o.pickupAddress);if(!ds)ds=[110.421,-6.982];let st=exC(o.pickupAddress);if(!st||(st[0]===ds[0]&&st[1]===ds[1]))st=[ds[0]-0.012,ds[1]+0.012];try{const map=new maplibregl.Map({container:'map-container-'+o.id,style:'https://tiles.openfreemap.org/styles/bright',center:ds,zoom:14,attributionControl:false});map.addControl(new maplibregl.NavigationControl(),'top-right');window.mapInstances[o.id]=map;window.mapCenters[o.id]=()=>map.flyTo({center:ds,zoom:15});const elD=document.createElement('div');elD.innerHTML='<div style="width:18px;height:18px;background:#4285F4;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.4);"></div>';new maplibregl.Marker({element:elD}).setLngLat(ds).addTo(map);const elM=document.createElement('div');elM.innerHTML='<div style="background:#FFF;padding:5px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#202124;font-size:20px;">two_wheeler</span></div>';const marker=new maplibregl.Marker({element:elM}).setLngLat(st).addTo(map);fetch(`https://router.project-osrm.org/route/v1/driving/${st[0]},${st[1]};${ds[0]},${ds[1]}?geometries=geojson`).then(r=>r.json()).then(dt=>{if(dt.routes&&dt.routes[0]){const gm=dt.routes[0].geometry;map.on('load',()=>{map.addSource('route',{type:'geojson',data:{type:'Feature',properties:{},geometry:gm}});map.addLayer({id:'route',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#4285F4','line-width':4}});let cArr=gm.coordinates,i=0;function anim(){if(i<cArr.length){marker.setLngLat(cArr[i]);i++;setTimeout(anim,15000/cArr.length);}}anim();});map.fitBounds(new maplibregl.LngLatBounds(st,st).extend(ds),{padding:30});}else{map.fitBounds(new maplibregl.LngLatBounds(st,st).extend(ds),{padding:30});}}).catch(()=>map.fitBounds(new maplibregl.LngLatBounds(st,st).extend(ds),{padding:30}));}catch(e){}}}});},300);};
-window.updateTimers=()=>{document.querySelectorAll('.order-timer').forEach(e=>{let d=Math.max(0,new Date().getTime()-new Date(e.getAttribute('data-time')).getTime());e.textContent=`${Math.floor(d/60000).toString().padStart(2,'0')}:${Math.floor((d%60000)/1000).toString().padStart(2,'0')} berlalu`;});document.querySelectorAll('.pending-timer').forEach(e=>{e.textContent=Math.max(0,Math.ceil((parseInt(e.getAttribute('data-until'))-Date.now())/1000));});};setInterval(window.updateTimers,1000);
-window.toggleArchiveDetail=id=>{let d=document.getElementById('arch-'+id),i=document.getElementById('arch-i-'+id);if(d.classList.contains('d-none')){d.classList.remove('d-none');i.textContent='expand_less';}else{d.classList.add('d-none');i.textContent='expand_more';}};
 
-// FUNGSI renderArchive TELAH DIPERBAIKI (Penambahan fallback e.contactName || 'Tanpa Nama')
+/* INTEGRASI FIREBASE & AUTENTIKASI: MENGIKUTI STRUKTUR USER SECARA KETAT */
+onAuthStateChanged(auth,async(user)=>{
+    if(user){
+        currentUserUid=user.uid;
+        currentUserEmail=user.email;
+        if(!window.isRegistering) await checkUserProfile(user);
+    }else{
+        currentUserUid='';
+        if(unsubscribeOrders) unsubscribeOrders();
+        document.getElementById('app').classList.remove('visible');
+        document.getElementById('splash').classList.remove('hidden');
+    }
+});
+
+async function checkUserProfile(user){
+  try{
+    const snap=await getDoc(doc(db,"user",user.uid)); 
+    if(snap.exists() && snap.data().wa){ 
+      currentUserData=snap.data();
+      updateUserAvatarUI(currentUserData);
+      document.getElementById('f-penerima-nama').value=currentUserData.nama||'';
+      document.getElementById('f-penerima-wa').value=currentUserData.wa||'';
+      document.getElementById('f-pengirim-nama').value=currentUserData.nama||'';
+      document.getElementById('f-pengirim-wa').value=currentUserData.wa||'';
+      
+      document.getElementById('splash').classList.add('hidden');
+      document.getElementById('complete-profile-modal').classList.remove('open');
+      document.getElementById('app').classList.add('visible');
+      
+      subscribeOrders();
+      document.getElementById('info-modal').classList.add('open');
+    }else{
+      document.getElementById('complete-profile-modal').classList.add('open');
+    }
+  }catch(e){ showToast('Gagal memuat profil'); }
+}
+
+function updateUserAvatarUI(d){
+    const a=document.getElementById('user-avatar');
+    if(d.urlProfile && d.urlProfile.trim()!=="") a.innerHTML=`<img src="${d.urlProfile}" alt="PFP">`;
+    else a.innerHTML=d.nama?d.nama[0].toUpperCase():'U';
+}
+
+window.switchAuth=m=>{
+    document.querySelectorAll('.auth-tab').forEach(e=>e.classList.remove('active'));
+    document.getElementById('auth-login-form').classList.add('d-none');
+    document.getElementById('auth-signup-form').classList.add('d-none');
+    document.getElementById('tab-'+m).classList.add('active');
+    document.getElementById('auth-'+m+'-form').classList.remove('d-none');
+};
+
+window.doLogin=async()=>{
+    const e=document.getElementById('login-user').value.trim(), p=document.getElementById('login-pass').value.trim();
+    if(!e||!p) return showToast('Isi email & password');
+    showLoading('Login...');
+    try{ await signInWithEmailAndPassword(auth,e,p); showToast('Login Berhasil'); }
+    catch(er){ showToast('Gagal: '+er.message); } finally{ hideLoading(); }
+};
+
+window.doSignup=async()=>{
+    const n=document.getElementById('signup-name').value.trim(),
+          ph=document.getElementById('signup-phone').value.trim(),
+          e=document.getElementById('signup-email').value.trim(),
+          p=document.getElementById('signup-pass').value.trim();
+    if(!n||!ph||!e||!p) return showToast('Lengkapi data');
+    if(p.length<6) return showToast('Password min 6');
+    showLoading('Mendaftar...');
+    window.isRegistering=true;
+    try{
+        const c=await createUserWithEmailAndPassword(auth,e,p);
+        // IMPLEMENTASI STRUKTUR KOLEKSI 'user' KETAT
+        await setDoc(doc(db,"user",c.user.uid), {
+            CustomerID: c.user.uid,
+            GetdriverID: "", // Dikosongkan sesuai permintaan
+            nama: n,
+            wa: ph,
+            email: e,
+            urlProfile: '',
+            role: 'customer',
+            saldo: 0,
+            stnk: "",
+            sim: "",
+            skck: "",
+            ktp: "",
+            status: 'belumterverifikasi'
+        });
+        window.isRegistering=false;
+        await checkUserProfile(c.user);
+        showToast('Berhasil');
+    }catch(er){ window.isRegistering=false; showToast('Gagal: '+er.message); }
+    finally{ hideLoading(); }
+};
+
+window.doGoogleAuth=async()=>{
+    try{ showLoading('Membuka Google...'); await signInWithPopup(auth,googleProvider); }
+    catch(e){ if(e.code!=='auth/popup-closed-by-user') showToast('Gagal: '+e.message); } finally{ hideLoading(); }
+};
+
+window.saveCompleteProfile=async()=>{
+    const n=document.getElementById('comp-name').value.trim(), ph=document.getElementById('comp-phone').value.trim();
+    if(!n||!ph) return showToast("Isi nama & WA");
+    showLoading("Menyimpan...");
+    try{
+        await setDoc(doc(db,"user",currentUserUid),{ 
+            CustomerID: currentUserUid, GetdriverID: "", nama: n, wa: ph, email: currentUserEmail, 
+            urlProfile: '', role: 'customer', saldo: 0, stnk: "", sim: "", skck: "", ktp: "", status: 'belumterverifikasi' 
+        },{merge:true});
+        document.getElementById('complete-profile-modal').classList.remove('open');
+        await checkUserProfile(auth.currentUser);
+        showToast('Profil dilengkapi');
+    }catch(e){ showToast(e.message); } finally{ hideLoading(); }
+};
+
+window.openProfileModal=()=>{
+    if(!currentUserData)return;
+    document.getElementById('prof-preview-img').style.display=currentUserData.urlProfile?'block':'none';
+    document.getElementById('prof-preview-text').style.display=currentUserData.urlProfile?'none':'block';
+    if(currentUserData.urlProfile) document.getElementById('prof-preview-img').src=currentUserData.urlProfile;
+    else document.getElementById('prof-preview-text').innerText=currentUserData.nama?currentUserData.nama[0].toUpperCase():'U';
+    document.getElementById('profile-name-display').innerText=currentUserData.nama||'-';
+    document.getElementById('profile-phone-display').innerText=currentUserData.wa||'-';
+    document.getElementById('profile-modal').classList.add('open');
+};
+window.closeProfileModal=()=>document.getElementById('profile-modal').classList.remove('open');
+
+window.openEditAccountModal=()=>{
+    document.getElementById('edit-name').value=currentUserData.nama||'';
+    document.getElementById('edit-phone').value=currentUserData.wa||'';
+    document.getElementById('edit-account-modal').classList.add('open');
+};
+window.closeEditAccountModal=()=>document.getElementById('edit-account-modal').classList.remove('open');
+
+window.saveEditAccount=async()=>{
+    const n=document.getElementById('edit-name').value.trim(), p=document.getElementById('edit-phone').value.trim();
+    if(!n||!p) return showToast('Nama dan nomor WA wajib diisi');
+    showLoading('Menyimpan...');
+    try{
+        await updateDoc(doc(db,"user",currentUserUid),{nama:n, wa:p});
+        currentUserData.nama=n; currentUserData.wa=p;
+        updateUserAvatarUI(currentUserData);
+        document.getElementById('profile-name-display').innerText=n;
+        document.getElementById('profile-phone-display').innerText=p;
+        window.closeEditAccountModal();
+        showToast('Akun diperbarui');
+    }catch(e){ showToast('Gagal update'); } finally{ hideLoading(); }
+};
+
+window.openHelpWA=()=>window.open('https://wa.me/6285138238914','_blank');
+
+window.previewAvatar=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=async ev=>{
+        const imgData=ev.target.result;
+        document.getElementById('prof-preview-img').src=imgData;
+        document.getElementById('prof-preview-img').style.display='block';
+        document.getElementById('prof-preview-text').style.display='none';
+        showLoading('Upload foto...');
+        try{
+            await updateDoc(doc(db,"user",currentUserUid),{urlProfile:imgData});
+            currentUserData.urlProfile=imgData;
+            updateUserAvatarUI(currentUserData);
+            showToast('Foto berhasil');
+        }catch(e){ showToast('Gagal upload'); } finally{ hideLoading(); }
+    };
+    r.readAsDataURL(f);
+};
+window.doLogout=()=>{ signOut(auth); document.getElementById('login-user').value=''; document.getElementById('login-pass').value=''; currentUserData=null; };
+
+/* UPLOAD ORDER - STRUKTUR FIELD 'orders' KETAT */
+window.doUpload=async()=>{
+    let gi=document.getElementById(selectedType==='Kirim Instan'?'f-pickup-loc':'f-delivery-loc');
+    if(gi.dataset.valid==="false") return showToast('GPS lemah');
+    
+    let pL=document.getElementById('f-pickup-loc').value.trim(),
+        pD=document.getElementById('f-pickup-detail').value.trim(),
+        dL=document.getElementById('f-delivery-loc').value.trim(),
+        dDe=document.getElementById('f-delivery-detail').value.trim(),
+        c=document.getElementById('f-catatan').value.trim(),
+        wj=document.getElementById('f-waktu-jadwal').value;
+        
+    let cn=document.getElementById(selectedType==='Kirim Instan'?'f-pengirim-nama':'f-penerima-nama').value.trim(),
+        cw=document.getElementById(selectedType==='Kirim Instan'?'f-pengirim-wa':'f-penerima-wa').value.trim();
+        
+    if(!pL||!pD||!dL||!dDe||!c||!cn||!cw||window.currentOrderFare===null) return showToast('Lengkapi data wajib (*)');
+    if(window.waktuType==='Jadwalkan'&&!wj) return showToast('Atur waktu jadwal');
+
+    // IMPLEMENTASI SELURUH FIELD 'orders' SESUAI REKOMENDASI IOD & IPO (Driver akan mengisi getdriverId dll nantinya)
+    const orderData = {
+        createdAt: new Date().toISOString(),
+        customerId: currentUserUid,
+        getdriverId: "", // Driver Web akan mengisinya saat swipe/terima pesanan
+        kategori: selectedType,
+        mapsAmbil: pL,
+        namaAmbil: pD,
+        mpasAntar: dL, // Penamaan ketat "mpasAntar"
+        NamaAntar: dDe,
+        catatan: c,
+        waktuAmbil: window.waktuType==='Jadwalkan' ? wj : 'Langsung',
+        namaPenerima: cn,
+        waPenerima: cw,
+        JarakTempuh: window.currentOrderDist,
+        Argo: window.currentOrderFare,
+        // Informasi Order Driver (IOD) disiapkan kosong
+        driverName: "",
+        waDriver: "",
+        sinceDriver: "",
+        rankDriver: "",
+        UrlprofileDriver: "",
+        kendaraanDriver: "",
+        // Informasi Proses Order (IPO) disiapkan kosong
+        titikAmbil: "",
+        sharelocationDriver: "",
+        status: 'menunggu', // menunggu -> terima -> ambil -> ngantar -> tiba -> selesai (DIPROSES DRIVER)
+        urlbuktiAmbil: "",
+        urlbuktiSelesai: ""
+    };
+
+    document.getElementById('sfx-create').play().catch(()=>{});
+    
+    // Clear Form
+    ['f-pickup-loc','f-pickup-detail','f-delivery-loc','f-delivery-detail','f-catatan','f-waktu-jadwal','f-penerima-nama','f-penerima-wa','f-pengirim-nama','f-pengirim-wa','f-distance'].forEach(i=>{if(document.getElementById(i))document.getElementById(i).value='';});
+    window.currentOrderDist=null; window.currentOrderFare=null;
+    document.getElementById('display-fare').textContent='Rp 0';
+    document.getElementById('f-pickup-loc-accuracy').classList.add('d-none'); document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');
+    gi.dataset.valid="true"; window.setWaktu('Langsung'); window.switchPage('proses');
+    
+    showLoading('Membuat pesanan...');
+    try{
+        await addDoc(collection(db,"orders"), orderData); 
+        showToast('Pesanan dibuat. Menunggu Driver...');
+    }catch(e){ showToast('Gagal simpan pesanan: ' + e.message); }
+    finally{ hideLoading(); }
+};
+
+/* PEMANTAUAN PROSES & RUTE OSRM (REAL-TIME INTEGRATION) */
+function subscribeOrders(){
+    if(unsubscribeOrders) unsubscribeOrders();
+    if(!currentUserUid) return;
+    
+    // Pemrosesan order murni sebagai viewer. Driver mengubah field via web driver.
+    unsubscribeOrders=onSnapshot(query(collection(db,"orders"), where("customerId","==",currentUserUid)), s=>{
+        let a=[];
+        s.forEach(d=>a.push({id:d.id, ...d.data()}));
+        a.sort((x,y)=>new Date(y.createdAt||0) - new Date(x.createdAt||0)); 
+        
+        window.activeOrdersData = a.filter(o=>o.status!=='selesai' && o.status!=='dibatalkan');
+        window.historyOrdersData = a.filter(o=>o.status==='selesai' || o.status==='dibatalkan');
+        
+        window.activeOrdersData.forEach(o=>{
+            // Menampilkan popup saat driver mengklik "tiba"
+            if(o.status === 'tiba' && window.currentArrivalOrderId !== o.id && !diprosesSet.has(o.id + '_tiba')){
+                diprosesSet.add(o.id + '_tiba');
+                window.showArrivalPopup(o.id, o.Argo);
+            }
+        });
+        
+        if(document.getElementById('page-proses').classList.contains('active')) window.renderProses();
+        if(document.getElementById('page-archive').classList.contains('active')) window.renderArchive();
+    });
+}
+
+// Fitur OSRM Route Fetcher
+async function drawRouteOSRM(map, startLngLat, endLngLat, routeId) {
+    if(!startLngLat || !endLngLat) return;
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLngLat[0]},${startLngLat[1]};${endLngLat[0]},${endLngLat[1]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.routes && data.routes[0]) {
+            const geojson = data.routes[0].geometry;
+            if(map.getSource(routeId)) {
+                map.getSource(routeId).setData(geojson);
+            } else {
+                map.addSource(routeId, { type: 'geojson', data: geojson });
+                map.addLayer({
+                    id: routeId, type: 'line', source: routeId,
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#06C167', 'line-width': 4 }
+                });
+            }
+        }
+    } catch(e) { console.error("Gagal load rute OSRM:", e); }
+}
+
+window.batalOrder=async id=>{
+    if(!confirm('Yakin batalkan?')) return;
+    showLoading('Membatalkan...');
+    try{ await updateDoc(doc(db,"orders",id), {status:'dibatalkan'}); showToast('Dibatalkan'); }
+    catch(e){ showToast('Gagal'); } finally{ hideLoading(); }
+};
+
+window.renderProses=()=>{
+    const c=document.getElementById('proses-results');
+    const all = window.activeOrdersData;
+    
+    if(!all.length){
+        c.innerHTML=`<div class="empty-state"><span class="material-symbols-outlined">inbox</span><p>Belum ada pesanan aktif.</p></div>`;
+        return;
+    }
+    
+    let h='';
+    all.forEach(o=>{
+        let stat=o.status;
+        let step1='', step2='', step3='', step4='';
+        let fillWidth='0%';
+        
+        // Membaca status yang diupdate oleh Driver Web
+        if(stat==='menunggu'){ step1='active'; fillWidth='15%'; }
+        else if(stat==='terima' || stat==='ambil'){ step1='done'; step2='active'; fillWidth='35%'; }
+        else if(stat==='ngantar'){ step1='done'; step2='done'; step3='active'; fillWidth='65%'; }
+        else if(stat==='tiba'){ step1='done'; step2='done'; step3='done'; step4='active'; fillWidth='100%'; }
+        
+        let driverCardHtml = '';
+        if(stat !== 'menunggu' && o.getdriverId){
+            driverCardHtml = `
+            <div class="driver-card" onclick="window.showDriverInfo('${o.id}')">
+                <img src="${o.UrlprofileDriver || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" alt="Driver">
+                <div class="driver-info">
+                    <div class="driver-name">${o.driverName}</div>
+                    <div class="driver-rating" style="display:flex;align-items:center;gap:4px;">
+                        <span class="material-symbols-outlined" style="color:#F5A524;font-size:14px;">shield</span> ${o.rankDriver || 'Driver'}
+                    </div>
+                </div>
+                <span class="material-symbols-outlined" style="color:var(--gray-400)">chevron_right</span>
+            </div>`;
+        }
+
+        h+=`<div class="order-card" id="card-${o.id}">
+            <div class="order-card-header" onclick="window.toggleDetail('${o.id}')">
+                <div>
+                    <div class="order-card-num">${o.kategori}</div>
+                    <div class="order-card-type">${new Date(o.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+                </div>
+                <div class="order-card-right">
+                    ${stat==='menunggu' ? `<div class="est-pill" style="background:var(--amber);color:#FFF;">Menunggu Driver</div>` : `<div class="est-pill">${stat.toUpperCase()}</div>`}
+                </div>
+            </div>
+            
+            <div class="order-card-body">
+                <div class="timeline-uber">
+                    <div class="tl-track"><div class="tl-fill" style="width:${fillWidth};"></div></div>
+                    <div class="tl-step ${step1}"><div class="tl-dot"><span class="material-symbols-outlined">search</span></div><div class="tl-label">Mencari</div></div>
+                    <div class="tl-step ${step2}"><div class="tl-dot"><span class="material-symbols-outlined">shopping_bag</span></div><div class="tl-label">Ambil</div></div>
+                    <div class="tl-step ${step3}"><div class="tl-dot"><span class="material-symbols-outlined">two_wheeler</span></div><div class="tl-label">Ngantar</div></div>
+                    <div class="tl-step ${step4}"><div class="tl-dot"><span class="material-symbols-outlined">flag</span></div><div class="tl-label">Tiba</div></div>
+                </div>
+                ${stat === 'menunggu' ? `<button class="btn-secondary" style="border-color:var(--red);color:var(--red);padding:8px;margin-bottom:8px;font-size:13px;" onclick="window.batalOrder('${o.id}')">Batalkan</button>` : ''}
+                <button class="toggle-detail-btn" onclick="window.toggleDetail('${o.id}')">
+                    <span id="icon-expand-${o.id}" class="material-symbols-outlined" style="font-size:18px;">expand_more</span> Detail
+                </button>
+            </div>
+            
+            <div id="detail-${o.id}" class="order-detail-panel d-none">
+                ${driverCardHtml}
+                ${(stat!=='menunggu') ? `
+                    <div id="map-container-${o.id}" style="height:180px;width:100%;border-radius:8px;margin-bottom:14px;border:1px solid var(--gray-200);position:relative;overflow:hidden;">
+                        <button onclick="if(window.mapCenters['${o.id}']) window.mapCenters['${o.id}']()" style="position:absolute;bottom:10px;right:10px;z-index:10;width:36px;height:36px;border-radius:50%;background:#FFF;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <span class="material-symbols-outlined" style="font-size:20px;color:#202124;">my_location</span>
+                        </button>
+                    </div>` : ''}
+                <div class="detail-grid">
+                    <div class="detail-row"><span class="detail-key">Argo</span><span class="detail-val" style="color:var(--green);font-size:16px;">Rp ${(o.Argo||0).toLocaleString('id-ID')}</span></div>
+                    <div class="detail-row"><span class="detail-key">Penerima</span><span class="detail-val">${o.namaPenerima}</span></div>
+                    <div class="detail-row"><span class="detail-key">Ambil</span><span class="detail-val">${o.namaAmbil}</span></div>
+                    <div class="detail-row"><span class="detail-key">Antar</span><span class="detail-val">${o.NamaAntar}</span></div>
+                </div>
+                <div class="action-btns-grid">
+                    ${(o.waDriver) ? `<button class="btn-green" onclick="window.open('https://wa.me/62${o.waDriver.replace(/^0/,'')}','_blank')">Hubungi Driver (WA)</button>` : ''}
+                </div>
+                </div>
+        </div>`;
+    });
+    
+    c.innerHTML=h;
+    
+    setTimeout(()=>{
+        all.forEach(o=>{
+            if(o.status!=='menunggu'){
+                let mEl=document.getElementById('map-container-'+o.id);
+                if(mEl && !mEl.dataset.initialized){
+                    mEl.dataset.initialized="true";
+                    
+                    // Ekstraksi rute berdasarkan mpasAntar (sebagai destinasi utama)
+                    let targetCoords = exC(o.mpasAntar) || exC(o.mapsAmbil) || [110.421, -6.982]; 
+                    
+                    const map = new maplibregl.Map({
+                        container: 'map-container-'+o.id,
+                        style: 'https://tiles.openfreemap.org/styles/bright',
+                        center: targetCoords,
+                        zoom: 14,
+                        attributionControl: false
+                    });
+                    
+                    window.mapInstances[o.id] = map;
+                    
+                    // Marker Tujuan Customer (mpasAntar)
+                    const elD = document.createElement('div');
+                    elD.innerHTML='<div style="width:18px;height:18px;background:#4285F4;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.4);"></div>';
+                    new maplibregl.Marker({element:elD}).setLngLat(targetCoords).addTo(map);
+
+                    // Marker Kendaraan Driver
+                    const elM = document.createElement('div');
+                    elM.innerHTML='<div style="background:#FFF;padding:5px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#202124;font-size:20px;">two_wheeler</span></div>';
+                    const driverMarker = new maplibregl.Marker({element:elM}).setLngLat(targetCoords).addTo(map); 
+                    window.currentDriverMarkers[o.id] = driverMarker;
+                    
+                    window.mapCenters[o.id] = () => map.flyTo({center: driverMarker.getLngLat(), zoom: 16});
+                    
+                    // Inisiasi OSRM Routing jika titikAmbil dan status ngantar
+                    map.on('load', ()=>{
+                        let startPoint = exC(o.sharelocationDriver) || exC(o.titikAmbil);
+                        if(startPoint && (o.status === 'ngantar' || o.status === 'tiba')){
+                            drawRouteOSRM(map, startPoint, targetCoords, 'route-'+o.id);
+                        }
+                    });
+                }
+                
+                // Realtime Tracker Update: diperbarui otomatis berdasarkan sharelocationDriver
+                if(window.mapInstances[o.id] && window.currentDriverMarkers[o.id] && o.sharelocationDriver){
+                    let dLoc = exC(o.sharelocationDriver);
+                    if(dLoc){
+                        window.currentDriverMarkers[o.id].setLngLat(dLoc);
+                    }
+                }
+            }
+        });
+    }, 300);
+};
+
+window.toggleDetail=id=>{
+    let d=document.getElementById('detail-'+id), i=document.getElementById('icon-expand-'+id);
+    if(d.classList.contains('d-none')){
+        d.classList.remove('d-none'); i.textContent='expand_less';
+        setTimeout(()=>window.dispatchEvent(new Event('resize')), 100);
+    }else{
+        d.classList.add('d-none'); i.textContent='expand_more';
+    }
+};
+
+window.showDriverInfo=id=>{
+    let order = window.activeOrdersData.find(o=>o.id === id);
+    if(!order) return;
+    document.getElementById('d-modal-name').innerText = order.driverName || 'Anonim';
+    document.getElementById('d-modal-img').src = order.UrlprofileDriver || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    document.getElementById('d-modal-rank').innerHTML = `<span class="material-symbols-outlined" style="color:#F5A524; font-size:18px;">shield</span> ${order.rankDriver || 'Driver'}`;
+    document.getElementById('d-modal-wa').innerText = order.waDriver || '-';
+    document.getElementById('d-modal-since').innerText = order.sinceDriver || '-';
+    document.getElementById('d-modal-kendaraan').innerText = order.kendaraanDriver || '-';
+    document.getElementById('driver-modal').classList.add('open');
+};
+
+window.closeDriverModal=()=>document.getElementById('driver-modal').classList.remove('open');
+
+window.showArrivalPopup=(orderId, fare)=>{
+    window.currentArrivalOrderId=orderId;
+    document.getElementById('arrival-fare-text').innerHTML=`Rp ${(fare||0).toLocaleString('id-ID')}`;
+    const modal=document.getElementById('arrival-modal');
+    modal.classList.add('open');
+    const ringtone=document.getElementById('sfx-ringtone');
+    ringtone.loop=true; ringtone.play().catch(()=>{});
+    window.arrivalRingInterval=setInterval(()=>{ if(ringtone.paused) ringtone.play().catch(()=>{}); }, 3000);
+};
+
+window.confirmArrival=async()=>{
+    if(window.arrivalRingInterval){ clearInterval(window.arrivalRingInterval); window.arrivalRingInterval=null; }
+    const ringtone=document.getElementById('sfx-ringtone');
+    ringtone.loop=false; ringtone.pause(); ringtone.currentTime=0;
+    document.getElementById('arrival-modal').classList.remove('open');
+    // CATATAN: Customer TIDAK mengubah field "status" menjadi 'selesai'. 
+    // Pesanan hanya dipindahkan ke arsip ketika DRIVER mengubah status menjadi "selesai" (Sesuai instruksi)
+};
+
 window.renderArchive=()=>{
-  const sv=document.getElementById('search-input').value.toLowerCase(),rs=document.getElementById('archive-results');
-  let f=window.historyOrdersData.filter(e=>(e.contactName||'Tanpa Nama').toLowerCase().includes(sv));
-  if(!f.length)return rs.innerHTML=`<div class="empty-state"><span class="material-symbols-outlined">receipt_long</span><p>Kosong.</p></div>`;
+  const sv=document.getElementById('search-input').value.toLowerCase(), rs=document.getElementById('archive-results');
+  let f=window.historyOrdersData.filter(e=>(e.namaPenerima||'Tanpa Nama').toLowerCase().includes(sv));
+  if(!f.length) return rs.innerHTML=`<div class="empty-state"><span class="material-symbols-outlined">receipt_long</span><p>Belum ada riwayat pesanan.</p></div>`;
   let h='';
   f.forEach(e=>{
     let b=e.status==='dibatalkan';
-    h+=`<div class="archive-card" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;gap:14px;width:100%;"><div class="archive-icon-wrap"><span class="material-symbols-outlined">${e.type==='Kirim Instan'?'local_shipping':(e.type==='Ambil Instan'?'home_pin':'storefront')}</span></div><div class="archive-info"><div class="archive-name">${e.contactName||'Tanpa Nama'}</div><div class="archive-meta">${e.type} · ${e.distanceKm||0} KM</div></div><div class="archive-right"><div class="archive-price">Rp ${(e.fare||0).toLocaleString('id-ID')}</div><div class="archive-badge" style="${b?'background:#FEE2E2;color:#DC2626;':'background:#DCFCE7;color:var(--green-dark);'}">${b?'Batal':'Selesai'}</div></div></div><button class="toggle-detail-btn" style="margin-top:10px;" onclick="window.toggleArchiveDetail('${e.id}')"><span id="arch-i-${e.id}" class="material-symbols-outlined">expand_more</span> Detail</button><div id="arch-${e.id}" class="d-none" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-200);font-size:13px;color:var(--gray-600);"><p><strong>Ambil:</strong> ${e.pickupDetail||'-'}</p><p><strong>Antar:</strong> ${e.deliveryDetail||'-'}</p></div></div>`;
+    h+=`<div class="archive-card" style="flex-direction:column;align-items:stretch;">
+        <div style="display:flex;align-items:center;gap:14px;width:100%;">
+            <div class="archive-icon-wrap"><span class="material-symbols-outlined">${e.kategori==='Kirim Instan'?'local_shipping':(e.kategori==='Ambil Instan'?'home_pin':'storefront')}</span></div>
+            <div class="archive-info"><div class="archive-name">${e.namaPenerima||'Tanpa Nama'}</div><div class="archive-meta">${e.kategori} · ${e.JarakTempuh||0} KM</div></div>
+            <div class="archive-right"><div class="archive-price">Rp ${(e.Argo||0).toLocaleString('id-ID')}</div><div class="archive-badge" style="${b?'background:#FEE2E2;color:#DC2626;':'background:#DCFCE7;color:var(--green-dark);'}">${b?'Batal':'Selesai'}</div></div>
+        </div>
+        <button class="toggle-detail-btn" style="margin-top:10px;" onclick="window.toggleArchiveDetail('${e.id}')"><span id="arch-i-${e.id}" class="material-symbols-outlined">expand_more</span> Detail</button>
+        <div id="arch-${e.id}" class="d-none" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-200);font-size:13px;color:var(--gray-600);">
+            <p><strong>Waktu:</strong> ${new Date(e.createdAt).toLocaleString('id-ID')}</p>
+            <p><strong>Driver:</strong> ${e.driverName||'-'}</p>
+            <p><strong>Ambil:</strong> ${e.namaAmbil||'-'}</p>
+            <p><strong>Antar:</strong> ${e.NamaAntar||'-'}</p>
+            ${e.urlbuktiSelesai ? `<a href="${e.urlbuktiSelesai}" target="_blank" style="color:var(--green); font-weight:bold; display:block; margin-top:6px;">Lihat Bukti Selesai</a>` : ''}
+        </div>
+    </div>`;
   });
   rs.innerHTML=h;
 };
 
-window.onSearch=()=>{document.getElementById('search-clear').classList.toggle('visible',document.getElementById('search-input').value.length>0);window.renderArchive();};window.clearSearch=()=>{document.getElementById('search-input').value='';window.onSearch();};
-let _tt;function showToast(m){let t=document.getElementById('toast');document.getElementById('toast-msg').textContent=m;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3500);}
-window.showDriverModal=()=>document.getElementById('driver-modal').classList.add('open');
-window.closeDriverModal=()=>document.getElementById('driver-modal').classList.remove('open');
+window.toggleArchiveDetail=id=>{
+    let d=document.getElementById('arch-'+id), i=document.getElementById('arch-i-'+id);
+    if(d.classList.contains('d-none')){ d.classList.remove('d-none'); i.textContent='expand_less'; }
+    else{ d.classList.add('d-none'); i.textContent='expand_more'; }
+};
+
+window.onSearch=()=>{ document.getElementById('search-clear').classList.toggle('visible',document.getElementById('search-input').value.length>0); window.renderArchive(); };
+window.clearSearch=()=>{ document.getElementById('search-input').value=''; window.onSearch(); };
+
+window.closeInfoModalAndFetchLoc=()=>{ document.getElementById('info-modal').classList.remove('open'); if(selectedType==='Kirim Instan') window.getLocation('f-pickup-loc'); else window.getLocation('f-delivery-loc'); };
+window.switchPage=p=>{ document.querySelectorAll('.page,.nav-item').forEach(x=>x.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.getElementById('nav-'+p).classList.add('active'); if(p==='proses') window.renderProses(); if(p==='archive') window.renderArchive(); };
+window.setWaktu=w=>{ window.waktuType=w; document.getElementById('btn-langsung').classList.toggle('active',w==='Langsung'); document.getElementById('btn-jadwal').classList.toggle('active',w==='Jadwalkan'); document.getElementById('f-waktu-jadwal').classList.toggle('d-none',w==='Langsung'); };
+window.openGoogleMaps=()=>window.open('https://maps.google.com/','_blank');
+window.getLocation=id=>{
+    if(!navigator.geolocation) return showToast('GPS tak didukung');
+    showToast('Mencari lokasi...');
+    navigator.geolocation.getCurrentPosition(p=>{
+        let ac=p.coords.accuracy, st='', c='', v=false;
+        if(ac<=15){st='Sangat Tinggi';c='var(--green-dark)';v=true;} else if(ac<=50){st='Tinggi';c='var(--green)';v=true;} else if(ac<=150){st='Sedang';c='var(--amber)';v=false;} else{st='Lemah';c='var(--red)';v=false;}
+        let i=document.getElementById(id); i.value=`${p.coords.longitude.toFixed(6)}, ${p.coords.latitude.toFixed(6)}`; i.dataset.valid=v; // OSRM/Maplibre prefer lng, lat structure for extraction reliability
+        let aDiv=document.getElementById(id+'-accuracy'); if(aDiv){aDiv.innerHTML=`Akurasi GPS: <strong style="color:${c}">${st}</strong> (±${Math.round(ac)}m)`; aDiv.classList.remove('d-none');}
+        showToast(!v?'Akurasi lemah, coba lagi':'Lokasi didapatkan');
+    },()=>showToast('Gagal akses GPS'),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+};
+window.calculateArgoManual=()=>{
+    let d=parseFloat(document.getElementById('f-distance').value);
+    if(!isNaN(d)&&d>0){
+        let f=0;
+        if(selectedType==='Jastip resto/toko'){
+            if(d<=1)f=6000; else if(d<=2)f=8000; else if(d<=3)f=8000+(Math.ceil((d-2)*20)*100); else if(d<=4)f=10000+(Math.ceil((d-3)*20)*100); else if(d<=5)f=12000+(Math.ceil((d-4)*20)*200); else f=12000+(Math.ceil((d-5)*20)*130);
+        }else{
+            if(d<=1)f=4300; else if(d<=2)f=4300+(Math.ceil((d-1)*20)*85); else if(d<=3)f=6000+(Math.ceil((d-2)*20)*50); else if(d<=4)f=7000+(Math.ceil((d-3)*20)*150); else if(d<=5)f=10000+(Math.ceil((d-4)*20)*100); else f=12000+(Math.ceil((d-5)*20)*125);
+        }
+        window.currentOrderDist=d; window.currentOrderFare=Math.round(f);
+        document.getElementById('display-fare').textContent='Rp '+window.currentOrderFare.toLocaleString('id-ID');
+    }else{ window.currentOrderDist=null; window.currentOrderFare=null; document.getElementById('display-fare').textContent='Rp 0'; }
+};
+window.selectType=(el,t)=>{
+    document.querySelectorAll('#type-chips .chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedType=t;
+    const nt=document.getElementById('notice-container'),ic=document.getElementById('icon-pickup'),fP=document.getElementById('f-pickup-loc'),bP=document.getElementById('btn-pickup-maps'),bPG=document.getElementById('btn-pickup-gps'),fD=document.getElementById('f-delivery-loc'),bD=document.getElementById('btn-delivery-maps'),bDG=document.getElementById('btn-delivery-gps'),cP=document.getElementById('container-penerima'),cPg=document.getElementById('container-pengirim');
+    fP.value='';fD.value='';fP.dataset.valid="true";fD.dataset.valid="true";
+    document.getElementById('f-pickup-loc-accuracy').classList.add('d-none'); document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');
+    if(t==='Jastip resto/toko'){
+        ic.textContent='storefront'; nt.innerHTML='<strong>Pemberitahuan:</strong> Pembayaran awal via transfer, ongkir dibayar setelah sampai.'; document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>'; fP.readOnly=false; fP.placeholder="Masukkan Link Maps..."; bP.classList.remove('d-none'); bPG.classList.add('d-none'); document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fD.readOnly=true; fD.placeholder="Tekan GPS..."; bD.classList.add('d-none'); bDG.classList.remove('d-none'); cP.classList.remove('d-none'); cPg.classList.add('d-none'); window.getLocation('f-delivery-loc');
+    }else if(t==='Ambil Instan'){
+        ic.textContent='home_pin'; nt.innerHTML='<strong>Pemberitahuan:</strong> Max 15 kg, PxLxT: 50x50x60 cm.'; document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>'; fP.readOnly=false; fP.placeholder="Masukkan Link Maps..."; bP.classList.remove('d-none'); bPG.classList.add('d-none'); document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fD.readOnly=true; fD.placeholder="Tekan GPS..."; bD.classList.add('d-none'); bDG.classList.remove('d-none'); cP.classList.remove('d-none'); cPg.classList.add('d-none'); window.getLocation('f-delivery-loc');
+    }else{
+        ic.textContent='storefront'; nt.innerHTML='<strong>Pemberitahuan:</strong> Max 15 kg, PxLxT: 50x50x60 cm.'; document.getElementById('label-pickup').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fP.readOnly=true; fP.placeholder="Tekan GPS..."; bP.classList.add('d-none'); bPG.classList.remove('d-none'); document.getElementById('label-delivery').innerHTML='Link Maps <span class="field-required">*</span>'; fD.readOnly=false; fD.placeholder="Masukkan Link Maps..."; bD.classList.remove('d-none'); bDG.classList.add('d-none'); cP.classList.add('d-none'); cPg.classList.remove('d-none'); window.getLocation('f-pickup-loc');
+    }
+};
+
+function exC(str){ 
+    if(!str) return null; 
+    let m=str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/); 
+    // Mengamankan pembacaan Lng, Lat
+    return m?[parseFloat(m[1]),parseFloat(m[2])]:null; 
+}
+
+let _tt;
+function showToast(m){
+    let t=document.getElementById('toast');
+    document.getElementById('toast-msg').textContent=m;
+    t.classList.add('show');
+    clearTimeout(_tt);
+    _tt=setTimeout(()=>t.classList.remove('show'),3500);
+}
 </script>
 </body>
 </html>
