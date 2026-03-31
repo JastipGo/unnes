@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>JastipUnnes</title>
+<title>JastipUnnes - Customer</title>
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
 <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <style>
-/* CSS TETAP SAMA SEPERTI SEBELUMNYA */
+/* --- CSS UI UTAMA (TIDAK BERUBAH) --- */
 :root{--black:#000;--white:#FFF;--gray-100:#F6F6F6;--gray-200:#EBEBEB;--gray-300:#D4D4D4;--gray-400:#9A9A9A;--gray-500:#6B6B6B;--gray-600:#3D3D3D;--gray-700:#2A2A2A;--gray-800:#1A1A1A;--gray-900:#111;--green:#06C167;--green-dark:#048A48;--red:#EE2434;--amber:#F5A524;--font:'DM Sans',sans-serif;--radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-full:100px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--gray-100);color:var(--black);font-family:var(--font);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
@@ -131,7 +131,7 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 
 <div class="modal-overlay" id="edit-account-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Edit Akun</div><div class="field-wrap"><label class="field-label">Nama Lengkap</label><input class="field" id="edit-name" type="text" placeholder="Nama Anda"></div><div class="field-wrap"><label class="field-label">Nomor WhatsApp</label><input class="field" id="edit-phone" type="number" placeholder="08xxxxxxxx"></div><button class="btn-primary" onclick="window.saveEditAccount()">Simpan</button><button class="btn-secondary" onclick="window.closeEditAccountModal()">Batal</button></div></div>
 
-<div class="modal-overlay" id="arrival-modal"><div class="modal-sheet" style="text-align:center;"><div class="modal-handle"></div><div class="dancing-container" style="position:relative; display:block; margin:0 auto 16px; left:0; bottom:0;"><img src="https://media.tenor.com/b545_qP83O8AAAAj/dancing-chicken.gif" alt="Stiker"></div><div class="modal-title" style="font-size:24px;">🎉 Pesanan Tiba! 🎉</div><div class="modal-sub" style="font-size:18px; font-weight:700; color:var(--green);" id="arrival-fare-text">Rp 0</div><p style="margin:12px 0; font-size:16px;">Pesanan Anda telah sampai di tujuan. Silakan lakukan pembayaran kepada driver.</p><button class="btn-primary" id="arrival-ok-btn" onclick="window.confirmArrival()">OK, Saya Mengerti</button></div></div>
+<div class="modal-overlay" id="arrival-modal"><div class="modal-sheet" style="text-align:center;"><div class="modal-handle"></div><div class="dancing-container" style="position:relative; display:block; margin:0 auto 16px; left:0; bottom:0;"><img src="https://media.tenor.com/b545_qP83O8AAAAj/dancing-chicken.gif" alt="Stiker"></div><div class="modal-title" style="font-size:24px;">🎉 Pesanan Tiba! 🎉</div><div class="modal-sub" style="font-size:18px; font-weight:700; color:var(--green);" id="arrival-fare-text">Rp 0</div><p style="margin:12px 0; font-size:16px;">Driver telah tiba di lokasi pengantaran. Lakukan pembayaran jika diperlukan.</p><button class="btn-primary" id="arrival-ok-btn" onclick="window.confirmArrival()">OK, Saya Mengerti</button></div></div>
 
 <div class="modal-overlay" id="complete-profile-modal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Lengkapi Profil Anda</div><div class="modal-sub">Silakan lengkapi nama dan nomor WhatsApp Anda untuk dapat melanjutkan.</div><div class="field-wrap"><label class="field-label">Nama Lengkap <span class="field-required">*</span></label><input class="field" id="comp-name" type="text" placeholder="Nama Anda"></div><div class="field-wrap"><label class="field-label">Nomor WhatsApp <span class="field-required">*</span></label><input class="field" id="comp-phone" type="number" placeholder="08xxxxxxxx"></div><button class="btn-primary" onclick="window.saveCompleteProfile()">Simpan & Lanjutkan</button></div></div>
 
@@ -143,9 +143,9 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 <div class="top-bar"><div class="top-bar-brand">Jastip<span>Unnes</span></div><div class="top-bar-actions"><div class="avatar" id="user-avatar" onclick="window.openProfileModal()" title="Profil">U</div><button class="icon-btn" onclick="window.doLogout()" title="Keluar"><span class="material-symbols-outlined">logout</span></button></div></div>
 <div class="content">
 
-<div class="page active" id="page-upload"><div class="page-header"><div class="page-title">Buat Pesanan</div><div class="page-sub">Pilih layanan dan isi detail pesanan</div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">category</span> Kategori Layanan</div><div class="chips-wrap" id="type-chips"><div class="chip selected" onclick="window.selectType(this,'Jastip resto/toko')">Jastip resto/toko</div><div class="chip" onclick="window.selectType(this,'Ambil Instan')">Ambil Instan</div><div class="chip" onclick="window.selectType(this,'Kirim Instan')">Kirim Instan</div></div><div id="notice-container" class="notice-card"><strong>Pemberitahuan:</strong> Di awal perlu TF untuk beli barang/makanannya, ongkos dibayar setelah sampai (Cash/TF). COD sepenuhnya jika sudah pernah memesan layanan minimal 1x.</div></div><div class="card"><div class="card-title"><span id="icon-pickup" class="material-symbols-outlined">storefront</span> <span id="label-pickup-title">Lokasi Pengambilan</span> <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-pickup">Link Maps <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-pickup-loc" type="text" placeholder="Masukkan Link Maps..." data-valid="true"><button class="btn-primary" id="btn-pickup-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary d-none" id="btn-pickup-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-pickup-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-pickup-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-pickup-detail" type="text" placeholder="Detail Toko / Lokasi Pengambilan"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">home_pin</span> Lokasi Pengiriman <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-delivery">Titik Koordinat <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-delivery-loc" type="text" placeholder="Tekan tombol GPS disamping..." readonly data-valid="true"><button class="btn-primary d-none" id="btn-delivery-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary" id="btn-delivery-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-delivery-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-delivery-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-delivery-detail" type="text" placeholder="Detail Alamat Pengiriman"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">notes</span> Catatan & Waktu</div><div class="field-wrap"><label class="field-label">Catatan Pesanan <span class="field-required">*</span></label><textarea class="field" id="f-catatan" rows="2" placeholder="Cth: Tolong letakkan di teras..."></textarea></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Waktu Pengambilan</label><div class="waktu-btns"><button class="btn-waktu active" id="btn-langsung" onclick="window.setWaktu('Langsung')">Langsung</button><button class="btn-waktu" id="btn-jadwal" onclick="window.setWaktu('Jadwalkan')">Jadwalkan</button></div><input type="datetime-local" class="field d-none" id="f-waktu-jadwal"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">person</span> Data Kontak <span class="field-required">*</span></div><div id="container-penerima"><div class="field-wrap"><label class="field-label">Nama Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-nama" type="text" placeholder="Nama Penerima Barang"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-wa" type="number" placeholder="08xxxxxxxx"></div></div><div id="container-pengirim" class="d-none"><div class="field-wrap"><label class="field-label">Nama Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-nama" type="text" placeholder="Nama Anda (Pengirim)"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-wa" type="number" placeholder="08xxxxxxxx"></div></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">payments</span> Tarif & Jarak</div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Jarak Tempuh (KM) <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-distance" type="number" step="0.1" min="0" placeholder="0.0" oninput="window.calculateArgoManual()"><button class="btn-primary" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button></div></div><div class="fare-display" style="margin-top:14px;"><div><div class="fare-label">Total Argo / Tarif</div></div><strong id="display-fare" class="fare-amount">Rp 0</strong></div></div><div class="submit-area"><button class="btn-primary" id="btn-upload" onclick="window.doUpload()" style="font-size:16px;"><span class="material-symbols-outlined">bolt</span> Buat Pesanan</button></div></div>
+<div class="page active" id="page-upload"><div class="page-header"><div class="page-title">Buat Pesanan</div><div class="page-sub">Pilih layanan dan isi detail pesanan</div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">category</span> Kategori Layanan</div><div class="chips-wrap" id="type-chips"><div class="chip selected" onclick="window.selectType(this,'Jastip resto/toko')">Jastip resto/toko</div><div class="chip" onclick="window.selectType(this,'Ambil Instan')">Ambil Instan</div><div class="chip" onclick="window.selectType(this,'Kirim Instan')">Kirim Instan</div></div><div id="notice-container" class="notice-card"><strong>Pemberitahuan:</strong> Pembayaran awal via transfer, ongkir dibayar setelah sampai.</div></div><div class="card"><div class="card-title"><span id="icon-pickup" class="material-symbols-outlined">storefront</span> <span id="label-pickup-title">Lokasi Pengambilan</span> <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-pickup">Link Maps <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-pickup-loc" type="text" placeholder="Masukkan Link Maps..." data-valid="true"><button class="btn-primary" id="btn-pickup-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary d-none" id="btn-pickup-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-pickup-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-pickup-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-pickup-detail" type="text" placeholder="Detail Toko / Lokasi Pengambilan"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">home_pin</span> Lokasi Pengiriman <span class="field-required">*</span></div><div class="field-wrap"><label class="field-label" id="label-delivery">Titik Koordinat <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-delivery-loc" type="text" placeholder="Tekan tombol GPS disamping..." readonly data-valid="true"><button class="btn-primary d-none" id="btn-delivery-maps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button><button class="btn-primary" id="btn-delivery-gps" style="width:auto;padding:0 14px;border-radius:var(--radius-md);background:var(--gray-700);" onclick="window.getLocation('f-delivery-loc')"><span class="material-symbols-outlined">my_location</span></button></div><div id="f-delivery-loc-accuracy" class="d-none" style="font-size: 11px; margin-top: 6px; font-weight: 600;"></div></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label><input class="field" id="f-delivery-detail" type="text" placeholder="Detail Alamat Pengiriman"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">notes</span> Catatan & Waktu</div><div class="field-wrap"><label class="field-label">Catatan Pesanan <span class="field-required">*</span></label><textarea class="field" id="f-catatan" rows="2" placeholder="Cth: Tolong letakkan di teras..."></textarea></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Waktu Pengambilan</label><div class="waktu-btns"><button class="btn-waktu active" id="btn-langsung" onclick="window.setWaktu('Langsung')">Langsung</button><button class="btn-waktu" id="btn-jadwal" onclick="window.setWaktu('Jadwalkan')">Jadwalkan</button></div><input type="datetime-local" class="field d-none" id="f-waktu-jadwal"></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">person</span> Data Kontak <span class="field-required">*</span></div><div id="container-penerima"><div class="field-wrap"><label class="field-label">Nama Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-nama" type="text" placeholder="Nama Penerima Barang"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Penerima <span class="field-required">*</span></label><input class="field" id="f-penerima-wa" type="number" placeholder="08xxxxxxxx"></div></div><div id="container-pengirim" class="d-none"><div class="field-wrap"><label class="field-label">Nama Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-nama" type="text" placeholder="Nama Anda (Pengirim)"></div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Nomor WhatsApp Pengirim <span class="field-required">*</span></label><input class="field" id="f-pengirim-wa" type="number" placeholder="08xxxxxxxx"></div></div></div><div class="card"><div class="card-title"><span class="material-symbols-outlined">payments</span> Tarif & Jarak</div><div class="field-wrap" style="margin-bottom:0"><label class="field-label">Jarak Tempuh (KM) <span class="field-required">*</span></label><div style="display:flex; gap:8px;"><input class="field" id="f-distance" type="number" step="0.1" min="0" placeholder="0.0" oninput="window.calculateArgoManual()"><button class="btn-primary" style="width:auto;padding:0 14px;border-radius:var(--radius-md);" onclick="window.openGoogleMaps()"><span class="material-symbols-outlined">map</span></button></div></div><div class="fare-display" style="margin-top:14px;"><div><div class="fare-label">Total Argo / Tarif</div></div><strong id="display-fare" class="fare-amount">Rp 0</strong></div></div><div class="submit-area"><button class="btn-primary" id="btn-upload" onclick="window.doUpload()" style="font-size:16px;"><span class="material-symbols-outlined">bolt</span> Buat Pesanan</button></div></div>
 
-<div class="page" id="page-proses"><div class="page-header"><div class="page-title">Pesanan Diproses</div><div class="page-sub">Pesanan aktif kamu</div></div><div id="proses-results"></div></div>
+<div class="page" id="page-proses"><div class="page-header"><div class="page-title">Pesanan Diproses</div><div class="page-sub">Pantau pesanan aktif kamu</div></div><div id="proses-results"></div></div>
 
 <div class="page" id="page-archive"><div class="page-header"><div class="page-title">Riwayat Selesai</div><div class="page-sub">Pesanan yang sudah selesai atau dibatalkan</div></div><div class="search-bar"><span class="material-symbols-outlined" style="color:var(--gray-400); font-size:20px;">search</span><input type="text" id="search-input" placeholder="Cari nama..." oninput="window.onSearch()"><button class="search-clear" id="search-clear" onclick="window.clearSearch()"><span class="material-symbols-outlined" style="font-size:20px;">close</span></button></div><div id="archive-results"></div></div>
 </div>
@@ -193,7 +193,7 @@ document.addEventListener('click',e=>{if(e.target.closest('.chip,.nav-item,.auth
 function showLoading(t){document.getElementById('loading-text').textContent=t;document.getElementById('loading-overlay').classList.add('visible');}
 function hideLoading(){document.getElementById('loading-overlay').classList.remove('visible');}
 
-/* INTEGRASI FIREBASE & AUTENTIKASI */
+/* INTEGRASI FIREBASE & AUTENTIKASI: MENGIKUTI STRUKTUR USER SECARA KETAT */
 onAuthStateChanged(auth,async(user)=>{
     if(user){
         currentUserUid=user.uid;
@@ -209,8 +209,8 @@ onAuthStateChanged(auth,async(user)=>{
 
 async function checkUserProfile(user){
   try{
-    const snap=await getDoc(doc(db,"user",user.uid)); // B. MENGGUNAKAN KOLEKSI "user" 
-    if(snap.exists() && snap.data().wa){ // Field wa sesuai instruksi 2
+    const snap=await getDoc(doc(db,"user",user.uid)); 
+    if(snap.exists() && snap.data().wa){ 
       currentUserData=snap.data();
       updateUserAvatarUI(currentUserData);
       document.getElementById('f-penerima-nama').value=currentUserData.nama||'';
@@ -222,20 +222,17 @@ async function checkUserProfile(user){
       document.getElementById('complete-profile-modal').classList.remove('open');
       document.getElementById('app').classList.add('visible');
       
-      // MULAI MENDENGARKAN PERUBAHAN ORDER
       subscribeOrders();
       document.getElementById('info-modal').classList.add('open');
     }else{
       document.getElementById('complete-profile-modal').classList.add('open');
     }
-  }catch(e){
-    showToast('Gagal memuat profil');
-  }
+  }catch(e){ showToast('Gagal memuat profil'); }
 }
 
 function updateUserAvatarUI(d){
     const a=document.getElementById('user-avatar');
-    if(d.urlProfile && d.urlProfile.trim()!=="") a.innerHTML=`<img src="${d.urlProfile}" alt="PFP">`; // Sesuai field urlProfile
+    if(d.urlProfile && d.urlProfile.trim()!=="") a.innerHTML=`<img src="${d.urlProfile}" alt="PFP">`;
     else a.innerHTML=d.nama?d.nama[0].toUpperCase():'U';
 }
 
@@ -266,26 +263,27 @@ window.doSignup=async()=>{
     window.isRegistering=true;
     try{
         const c=await createUserWithEmailAndPassword(auth,e,p);
-        // B. MENYIMPAN USER KE KOLEKSI "user" DENGAN FIELD SESUAI INSTRUKSI 2
+        // IMPLEMENTASI STRUKTUR KOLEKSI 'user' KETAT
         await setDoc(doc(db,"user",c.user.uid), {
             CustomerID: c.user.uid,
+            GetdriverID: "", // Dikosongkan sesuai permintaan
             nama: n,
             wa: ph,
             email: e,
             urlProfile: '',
             role: 'customer',
             saldo: 0,
+            stnk: "",
+            sim: "",
+            skck: "",
+            ktp: "",
             status: 'belumterverifikasi'
         });
         window.isRegistering=false;
         await checkUserProfile(c.user);
         showToast('Berhasil');
-    }catch(er){
-        window.isRegistering=false;
-        showToast('Gagal: '+er.message);
-    }finally{
-        hideLoading();
-    }
+    }catch(er){ window.isRegistering=false; showToast('Gagal: '+er.message); }
+    finally{ hideLoading(); }
 };
 
 window.doGoogleAuth=async()=>{
@@ -294,13 +292,14 @@ window.doGoogleAuth=async()=>{
 };
 
 window.saveCompleteProfile=async()=>{
-    const n=document.getElementById('comp-name').value.trim(),
-          ph=document.getElementById('comp-phone').value.trim();
+    const n=document.getElementById('comp-name').value.trim(), ph=document.getElementById('comp-phone').value.trim();
     if(!n||!ph) return showToast("Isi nama & WA");
     showLoading("Menyimpan...");
     try{
-        // Menyimpan data profile untuk pengguna yang mungkin login dengan Google namun belum lengkap
-        await setDoc(doc(db,"user",currentUserUid),{ CustomerID: currentUserUid, nama: n, wa: ph, email: currentUserEmail, urlProfile: '', role: 'customer', status: 'belumterverifikasi' },{merge:true});
+        await setDoc(doc(db,"user",currentUserUid),{ 
+            CustomerID: currentUserUid, GetdriverID: "", nama: n, wa: ph, email: currentUserEmail, 
+            urlProfile: '', role: 'customer', saldo: 0, stnk: "", sim: "", skck: "", ktp: "", status: 'belumterverifikasi' 
+        },{merge:true});
         document.getElementById('complete-profile-modal').classList.remove('open');
         await checkUserProfile(auth.currentUser);
         showToast('Profil dilengkapi');
@@ -317,8 +316,8 @@ window.openProfileModal=()=>{
     document.getElementById('profile-phone-display').innerText=currentUserData.wa||'-';
     document.getElementById('profile-modal').classList.add('open');
 };
-
 window.closeProfileModal=()=>document.getElementById('profile-modal').classList.remove('open');
+
 window.openEditAccountModal=()=>{
     document.getElementById('edit-name').value=currentUserData.nama||'';
     document.getElementById('edit-phone').value=currentUserData.wa||'';
@@ -344,8 +343,7 @@ window.saveEditAccount=async()=>{
 window.openHelpWA=()=>window.open('https://wa.me/6285138238914','_blank');
 
 window.previewAvatar=e=>{
-    const f=e.target.files[0];
-    if(!f) return;
+    const f=e.target.files[0]; if(!f) return;
     const r=new FileReader();
     r.onload=async ev=>{
         const imgData=ev.target.result;
@@ -354,7 +352,7 @@ window.previewAvatar=e=>{
         document.getElementById('prof-preview-text').style.display='none';
         showLoading('Upload foto...');
         try{
-            await updateDoc(doc(db,"user",currentUserUid),{urlProfile:imgData}); // Field urlProfile
+            await updateDoc(doc(db,"user",currentUserUid),{urlProfile:imgData});
             currentUserData.urlProfile=imgData;
             updateUserAvatarUI(currentUserData);
             showToast('Foto berhasil');
@@ -362,10 +360,9 @@ window.previewAvatar=e=>{
     };
     r.readAsDataURL(f);
 };
-
 window.doLogout=()=>{ signOut(auth); document.getElementById('login-user').value=''; document.getElementById('login-pass').value=''; currentUserData=null; };
 
-/* UPLOAD ORDER - INTEGRASI FIELD */
+/* UPLOAD ORDER - STRUKTUR FIELD 'orders' KETAT */
 window.doUpload=async()=>{
     let gi=document.getElementById(selectedType==='Kirim Instan'?'f-pickup-loc':'f-delivery-loc');
     if(gi.dataset.valid==="false") return showToast('GPS lemah');
@@ -383,14 +380,15 @@ window.doUpload=async()=>{
     if(!pL||!pD||!dL||!dDe||!c||!cn||!cw||window.currentOrderFare===null) return showToast('Lengkapi data wajib (*)');
     if(window.waktuType==='Jadwalkan'&&!wj) return showToast('Atur waktu jadwal');
 
-    // B. MENGGUNAKAN FIELD ORDER CUSTOMER (IOC) SESUAI INSTRUKSI 1
+    // IMPLEMENTASI SELURUH FIELD 'orders' SESUAI REKOMENDASI IOD & IPO (Driver akan mengisi getdriverId dll nantinya)
     const orderData = {
         createdAt: new Date().toISOString(),
         customerId: currentUserUid,
+        getdriverId: "", // Driver Web akan mengisinya saat swipe/terima pesanan
         kategori: selectedType,
         mapsAmbil: pL,
         namaAmbil: pD,
-        mpasAntar: dL, // Ingat, instruksinya strict "mpasAntar"
+        mpasAntar: dL, // Penamaan ketat "mpasAntar"
         NamaAntar: dDe,
         catatan: c,
         waktuAmbil: window.waktuType==='Jadwalkan' ? wj : 'Langsung',
@@ -398,7 +396,19 @@ window.doUpload=async()=>{
         waPenerima: cw,
         JarakTempuh: window.currentOrderDist,
         Argo: window.currentOrderFare,
-        status: 'menunggu' // Status awal saat menunggu driver menerima
+        // Informasi Order Driver (IOD) disiapkan kosong
+        driverName: "",
+        waDriver: "",
+        sinceDriver: "",
+        rankDriver: "",
+        UrlprofileDriver: "",
+        kendaraanDriver: "",
+        // Informasi Proses Order (IPO) disiapkan kosong
+        titikAmbil: "",
+        sharelocationDriver: "",
+        status: 'menunggu', // menunggu -> terima -> ambil -> ngantar -> tiba -> selesai (DIPROSES DRIVER)
+        urlbuktiAmbil: "",
+        urlbuktiSelesai: ""
     };
 
     document.getElementById('sfx-create').play().catch(()=>{});
@@ -412,33 +422,28 @@ window.doUpload=async()=>{
     
     showLoading('Membuat pesanan...');
     try{
-        // Langsung simpan ke Firebase. Pemprosesan selanjutnya akan dilakukan oleh Driver Web
-        await addDoc(collection(db,"orders"), orderData); // Anggap koleksi orders
-        showToast('Pesanan berhasil dibuat!');
-    }catch(e){
-        showToast('Gagal simpan pesanan: ' + e.message);
-    }finally{
-        hideLoading();
-    }
+        await addDoc(collection(db,"orders"), orderData); 
+        showToast('Pesanan dibuat. Menunggu Driver...');
+    }catch(e){ showToast('Gagal simpan pesanan: ' + e.message); }
+    finally{ hideLoading(); }
 };
 
-/* PENDENGAR STATUS PESANAN (REAL-TIME INTEGRATION) */
+/* PEMANTAUAN PROSES & RUTE OSRM (REAL-TIME INTEGRATION) */
 function subscribeOrders(){
     if(unsubscribeOrders) unsubscribeOrders();
     if(!currentUserUid) return;
     
-    // Dengarkan order yang memiliki customerId sama dengan user yang login
+    // Pemrosesan order murni sebagai viewer. Driver mengubah field via web driver.
     unsubscribeOrders=onSnapshot(query(collection(db,"orders"), where("customerId","==",currentUserUid)), s=>{
         let a=[];
         s.forEach(d=>a.push({id:d.id, ...d.data()}));
-        a.sort((x,y)=>new Date(y.createdAt||0) - new Date(x.createdAt||0)); // Berdasarkan createdAt
+        a.sort((x,y)=>new Date(y.createdAt||0) - new Date(x.createdAt||0)); 
         
-        // Memisahkan data aktif vs history berdasarkan status yang baru (terima/ambil/ngantar/tiba/selesai)
         window.activeOrdersData = a.filter(o=>o.status!=='selesai' && o.status!=='dibatalkan');
         window.historyOrdersData = a.filter(o=>o.status==='selesai' || o.status==='dibatalkan');
         
         window.activeOrdersData.forEach(o=>{
-            // Jika status tiba dan popup belum pernah muncul, tampilkan
+            // Menampilkan popup saat driver mengklik "tiba"
             if(o.status === 'tiba' && window.currentArrivalOrderId !== o.id && !diprosesSet.has(o.id + '_tiba')){
                 diprosesSet.add(o.id + '_tiba');
                 window.showArrivalPopup(o.id, o.Argo);
@@ -448,6 +453,29 @@ function subscribeOrders(){
         if(document.getElementById('page-proses').classList.contains('active')) window.renderProses();
         if(document.getElementById('page-archive').classList.contains('active')) window.renderArchive();
     });
+}
+
+// Fitur OSRM Route Fetcher
+async function drawRouteOSRM(map, startLngLat, endLngLat, routeId) {
+    if(!startLngLat || !endLngLat) return;
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLngLat[0]},${startLngLat[1]};${endLngLat[0]},${endLngLat[1]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.routes && data.routes[0]) {
+            const geojson = data.routes[0].geometry;
+            if(map.getSource(routeId)) {
+                map.getSource(routeId).setData(geojson);
+            } else {
+                map.addSource(routeId, { type: 'geojson', data: geojson });
+                map.addLayer({
+                    id: routeId, type: 'line', source: routeId,
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#06C167', 'line-width': 4 }
+                });
+            }
+        }
+    } catch(e) { console.error("Gagal load rute OSRM:", e); }
 }
 
 window.batalOrder=async id=>{
@@ -472,16 +500,14 @@ window.renderProses=()=>{
         let step1='', step2='', step3='', step4='';
         let fillWidth='0%';
         
-        // MAP NEW STATUSES -> UI Timeline
-        // status: menunggu -> terima -> ambil -> ngantar -> tiba -> selesai
+        // Membaca status yang diupdate oleh Driver Web
         if(stat==='menunggu'){ step1='active'; fillWidth='15%'; }
         else if(stat==='terima' || stat==='ambil'){ step1='done'; step2='active'; fillWidth='35%'; }
         else if(stat==='ngantar'){ step1='done'; step2='done'; step3='active'; fillWidth='65%'; }
         else if(stat==='tiba'){ step1='done'; step2='done'; step3='done'; step4='active'; fillWidth='100%'; }
         
-        // Info Driver jika driver sudah menerima pesanan (IOD)
         let driverCardHtml = '';
-        if(stat !== 'menunggu' && o.driverName){
+        if(stat !== 'menunggu' && o.getdriverId){
             driverCardHtml = `
             <div class="driver-card" onclick="window.showDriverInfo('${o.id}')">
                 <img src="${o.UrlprofileDriver || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" alt="Driver">
@@ -537,13 +563,12 @@ window.renderProses=()=>{
                 <div class="action-btns-grid">
                     ${(o.waDriver) ? `<button class="btn-green" onclick="window.open('https://wa.me/62${o.waDriver.replace(/^0/,'')}','_blank')">Hubungi Driver (WA)</button>` : ''}
                 </div>
-            </div>
+                </div>
         </div>`;
     });
     
     c.innerHTML=h;
     
-    // Inisialisasi Peta & Track Lokasi Driver secara real-time
     setTimeout(()=>{
         all.forEach(o=>{
             if(o.status!=='menunggu'){
@@ -551,7 +576,7 @@ window.renderProses=()=>{
                 if(mEl && !mEl.dataset.initialized){
                     mEl.dataset.initialized="true";
                     
-                    // Ekstraksi koordinat. Field mapsAmbil/mpasAntar dipastikan koordinatnya
+                    // Ekstraksi rute berdasarkan mpasAntar (sebagai destinasi utama)
                     let targetCoords = exC(o.mpasAntar) || exC(o.mapsAmbil) || [110.421, -6.982]; 
                     
                     const map = new maplibregl.Map({
@@ -564,21 +589,29 @@ window.renderProses=()=>{
                     
                     window.mapInstances[o.id] = map;
                     
-                    // Marker Tujuan
+                    // Marker Tujuan Customer (mpasAntar)
                     const elD = document.createElement('div');
                     elD.innerHTML='<div style="width:18px;height:18px;background:#4285F4;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.4);"></div>';
                     new maplibregl.Marker({element:elD}).setLngLat(targetCoords).addTo(map);
 
-                    // Marker Motor Driver
+                    // Marker Kendaraan Driver
                     const elM = document.createElement('div');
                     elM.innerHTML='<div style="background:#FFF;padding:5px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#202124;font-size:20px;">two_wheeler</span></div>';
-                    const driverMarker = new maplibregl.Marker({element:elM}).setLngLat(targetCoords).addTo(map); // Default pos
+                    const driverMarker = new maplibregl.Marker({element:elM}).setLngLat(targetCoords).addTo(map); 
                     window.currentDriverMarkers[o.id] = driverMarker;
                     
                     window.mapCenters[o.id] = () => map.flyTo({center: driverMarker.getLngLat(), zoom: 16});
+                    
+                    // Inisiasi OSRM Routing jika titikAmbil dan status ngantar
+                    map.on('load', ()=>{
+                        let startPoint = exC(o.sharelocationDriver) || exC(o.titikAmbil);
+                        if(startPoint && (o.status === 'ngantar' || o.status === 'tiba')){
+                            drawRouteOSRM(map, startPoint, targetCoords, 'route-'+o.id);
+                        }
+                    });
                 }
                 
-                // Real-time Update Marker Driver berdasarkan field sharelocationDriver (dikirim oleh Driver Web)
+                // Realtime Tracker Update: diperbarui otomatis berdasarkan sharelocationDriver
                 if(window.mapInstances[o.id] && window.currentDriverMarkers[o.id] && o.sharelocationDriver){
                     let dLoc = exC(o.sharelocationDriver);
                     if(dLoc){
@@ -629,17 +662,8 @@ window.confirmArrival=async()=>{
     const ringtone=document.getElementById('sfx-ringtone');
     ringtone.loop=false; ringtone.pause(); ringtone.currentTime=0;
     document.getElementById('arrival-modal').classList.remove('open');
-    
-    // Konfirmasi selesai dari sisi pelanggan juga
-    if(window.currentArrivalOrderId){
-        try{
-            await updateDoc(doc(db,"orders",window.currentArrivalOrderId),{status:'selesai'});
-            showToast('Pesanan telah diselesaikan');
-        }catch(e){
-            showToast('Gagal menyelesaikan');
-        }
-    }
-    window.currentArrivalOrderId=null;
+    // CATATAN: Customer TIDAK mengubah field "status" menjadi 'selesai'. 
+    // Pesanan hanya dipindahkan ke arsip ketika DRIVER mengubah status menjadi "selesai" (Sesuai instruksi)
 };
 
 window.renderArchive=()=>{
@@ -661,6 +685,7 @@ window.renderArchive=()=>{
             <p><strong>Driver:</strong> ${e.driverName||'-'}</p>
             <p><strong>Ambil:</strong> ${e.namaAmbil||'-'}</p>
             <p><strong>Antar:</strong> ${e.NamaAntar||'-'}</p>
+            ${e.urlbuktiSelesai ? `<a href="${e.urlbuktiSelesai}" target="_blank" style="color:var(--green); font-weight:bold; display:block; margin-top:6px;">Lihat Bukti Selesai</a>` : ''}
         </div>
     </div>`;
   });
@@ -676,7 +701,6 @@ window.toggleArchiveDetail=id=>{
 window.onSearch=()=>{ document.getElementById('search-clear').classList.toggle('visible',document.getElementById('search-input').value.length>0); window.renderArchive(); };
 window.clearSearch=()=>{ document.getElementById('search-input').value=''; window.onSearch(); };
 
-// Utility functions that haven't changed much
 window.closeInfoModalAndFetchLoc=()=>{ document.getElementById('info-modal').classList.remove('open'); if(selectedType==='Kirim Instan') window.getLocation('f-pickup-loc'); else window.getLocation('f-delivery-loc'); };
 window.switchPage=p=>{ document.querySelectorAll('.page,.nav-item').forEach(x=>x.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.getElementById('nav-'+p).classList.add('active'); if(p==='proses') window.renderProses(); if(p==='archive') window.renderArchive(); };
 window.setWaktu=w=>{ window.waktuType=w; document.getElementById('btn-langsung').classList.toggle('active',w==='Langsung'); document.getElementById('btn-jadwal').classList.toggle('active',w==='Jadwalkan'); document.getElementById('f-waktu-jadwal').classList.toggle('d-none',w==='Langsung'); };
@@ -687,7 +711,7 @@ window.getLocation=id=>{
     navigator.geolocation.getCurrentPosition(p=>{
         let ac=p.coords.accuracy, st='', c='', v=false;
         if(ac<=15){st='Sangat Tinggi';c='var(--green-dark)';v=true;} else if(ac<=50){st='Tinggi';c='var(--green)';v=true;} else if(ac<=150){st='Sedang';c='var(--amber)';v=false;} else{st='Lemah';c='var(--red)';v=false;}
-        let i=document.getElementById(id); i.value=`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`; i.dataset.valid=v;
+        let i=document.getElementById(id); i.value=`${p.coords.longitude.toFixed(6)}, ${p.coords.latitude.toFixed(6)}`; i.dataset.valid=v; // OSRM/Maplibre prefer lng, lat structure for extraction reliability
         let aDiv=document.getElementById(id+'-accuracy'); if(aDiv){aDiv.innerHTML=`Akurasi GPS: <strong style="color:${c}">${st}</strong> (±${Math.round(ac)}m)`; aDiv.classList.remove('d-none');}
         showToast(!v?'Akurasi lemah, coba lagi':'Lokasi didapatkan');
     },()=>showToast('Gagal akses GPS'),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
@@ -711,7 +735,7 @@ window.selectType=(el,t)=>{
     fP.value='';fD.value='';fP.dataset.valid="true";fD.dataset.valid="true";
     document.getElementById('f-pickup-loc-accuracy').classList.add('d-none'); document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');
     if(t==='Jastip resto/toko'){
-        ic.textContent='storefront'; nt.innerHTML='<strong>Pemberitahuan:</strong> Pembayaran hanya TF untuk beli, ongkos dibayar COD/TF. COD 100% jika pernah pesan minimal 1x.'; document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>'; fP.readOnly=false; fP.placeholder="Masukkan Link Maps..."; bP.classList.remove('d-none'); bPG.classList.add('d-none'); document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fD.readOnly=true; fD.placeholder="Tekan GPS..."; bD.classList.add('d-none'); bDG.classList.remove('d-none'); cP.classList.remove('d-none'); cPg.classList.add('d-none'); window.getLocation('f-delivery-loc');
+        ic.textContent='storefront'; nt.innerHTML='<strong>Pemberitahuan:</strong> Pembayaran awal via transfer, ongkir dibayar setelah sampai.'; document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>'; fP.readOnly=false; fP.placeholder="Masukkan Link Maps..."; bP.classList.remove('d-none'); bPG.classList.add('d-none'); document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fD.readOnly=true; fD.placeholder="Tekan GPS..."; bD.classList.add('d-none'); bDG.classList.remove('d-none'); cP.classList.remove('d-none'); cPg.classList.add('d-none'); window.getLocation('f-delivery-loc');
     }else if(t==='Ambil Instan'){
         ic.textContent='home_pin'; nt.innerHTML='<strong>Pemberitahuan:</strong> Max 15 kg, PxLxT: 50x50x60 cm.'; document.getElementById('label-pickup').innerHTML='Link Maps <span class="field-required">*</span>'; fP.readOnly=false; fP.placeholder="Masukkan Link Maps..."; bP.classList.remove('d-none'); bPG.classList.add('d-none'); document.getElementById('label-delivery').innerHTML='Titik Koordinat <span class="field-required">*</span>'; fD.readOnly=true; fD.placeholder="Tekan GPS..."; bD.classList.add('d-none'); bDG.classList.remove('d-none'); cP.classList.remove('d-none'); cPg.classList.add('d-none'); window.getLocation('f-delivery-loc');
     }else{
@@ -719,7 +743,12 @@ window.selectType=(el,t)=>{
     }
 };
 
-function exC(str){ if(!str) return null; let m=str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/); return m?[parseFloat(m[2]),parseFloat(m[1])]:null; }
+function exC(str){ 
+    if(!str) return null; 
+    let m=str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/); 
+    // Mengamankan pembacaan Lng, Lat
+    return m?[parseFloat(m[1]),parseFloat(m[2])]:null; 
+}
 
 let _tt;
 function showToast(m){
