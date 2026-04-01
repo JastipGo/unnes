@@ -83,7 +83,7 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 .detail-grid{background:var(--gray-100);border-radius:var(--radius-md);padding:14px;font-size:13px;line-height:1.7;color:var(--gray-600);font-weight:500}
 .detail-row{display:flex;justify-content:space-between;margin-bottom:4px}.detail-key{color:var(--gray-400)}.detail-val{color:var(--black);font-weight:600;text-align:right;max-width:60%}
 .action-btns-grid{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-.archive-card{background:var(--white);margin:10px 16px 0;border-radius:var(--radius-lg);padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:stretch}
+.archive-card{background:var(--white);margin:10px 16px 0;border-radius:var(--radius-lg);padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:14px}
 .archive-icon-wrap{width:44px;height:44px;border-radius:var(--radius-md);background:var(--gray-100);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--gray-600)}
 .archive-info{flex:1;min-width:0}.archive-name{font-size:15px;font-weight:700;color:var(--black)}.archive-meta{font-size:12px;font-weight:500;color:var(--gray-400);margin-top:3px}
 .archive-right{text-align:right;flex-shrink:0}.archive-price{font-size:16px;font-weight:800;color:var(--black);letter-spacing:-0.5px}
@@ -166,6 +166,7 @@ const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvid
 let currentUserUid='',currentUserEmail='',currentUserData=null;
 let selectedType='Jastip resto/toko';
 window.activeOrdersData=[];
+window.historyOrdersData=[];
 let unsubscribeOrders=null, diprosesSet=new Set();
 window.currentOrderDist=null;
 window.currentOrderFare=null;
@@ -176,42 +177,6 @@ window.mapCenters={};
 window.arrivalRingInterval=null;
 window.currentArrivalOrderId=null;
 window.currentDriverMarkers={};
-
-// --- CACHE UNTUK RIWAYAT (localStorage) ---
-window.localHistoryOrders = []; // array of order objects (status selesai/dibatalkan)
-
-function loadLocalHistory() {
-  if (!currentUserUid) return;
-  const key = `jastip_history_${currentUserUid}`;
-  const stored = localStorage.getItem(key);
-  if (stored) {
-    try {
-      window.localHistoryOrders = JSON.parse(stored);
-    } catch(e) { window.localHistoryOrders = []; }
-  } else {
-    window.localHistoryOrders = [];
-  }
-}
-
-function saveLocalHistory() {
-  if (!currentUserUid) return;
-  const key = `jastip_history_${currentUserUid}`;
-  localStorage.setItem(key, JSON.stringify(window.localHistoryOrders));
-}
-
-function addToLocalHistory(order) {
-  if (!order || !order.id) return;
-  // cek duplikat
-  const exists = window.localHistoryOrders.some(o => o.id === order.id);
-  if (!exists) {
-    window.localHistoryOrders.unshift(order); // terbaru di atas
-    saveLocalHistory();
-    // jika halaman arsip sedang aktif, render ulang
-    if (document.getElementById('page-archive').classList.contains('active')) {
-      window.renderArchive();
-    }
-  }
-}
 
 /* UI & UX Handlers */
 if(window.visualViewport){
@@ -228,6 +193,7 @@ document.addEventListener('click',e=>{if(e.target.closest('.chip,.nav-item,.auth
 function showLoading(t){document.getElementById('loading-text').textContent=t;document.getElementById('loading-overlay').classList.add('visible');}
 function hideLoading(){document.getElementById('loading-overlay').classList.remove('visible');}
 
+/* INTEGRASI FIREBASE & AUTENTIKASI: MENGIKUTI STRUKTUR USER SECARA KETAT */
 onAuthStateChanged(auth,async(user)=>{
     if(user){
         currentUserUid=user.uid;
@@ -251,9 +217,6 @@ async function checkUserProfile(user){
       document.getElementById('f-penerima-wa').value=currentUserData.wa||'';
       document.getElementById('f-pengirim-nama').value=currentUserData.nama||'';
       document.getElementById('f-pengirim-wa').value=currentUserData.wa||'';
-      
-      // Load history dari cache lokal
-      loadLocalHistory();
       
       document.getElementById('splash').classList.add('hidden');
       document.getElementById('complete-profile-modal').classList.remove('open');
@@ -300,9 +263,10 @@ window.doSignup=async()=>{
     window.isRegistering=true;
     try{
         const c=await createUserWithEmailAndPassword(auth,e,p);
+        // IMPLEMENTASI STRUKTUR KOLEKSI 'user' KETAT
         await setDoc(doc(db,"user",c.user.uid), {
             CustomerID: c.user.uid,
-            GetdriverID: "",
+            GetdriverID: "", // Dikosongkan sesuai permintaan
             nama: n,
             wa: ph,
             email: e,
@@ -396,14 +360,9 @@ window.previewAvatar=e=>{
     };
     r.readAsDataURL(f);
 };
-window.doLogout=()=>{ 
-  signOut(auth); 
-  document.getElementById('login-user').value=''; 
-  document.getElementById('login-pass').value=''; 
-  currentUserData=null;
-};
+window.doLogout=()=>{ signOut(auth); document.getElementById('login-user').value=''; document.getElementById('login-pass').value=''; currentUserData=null; };
 
-/* UPLOAD ORDER */
+/* UPLOAD ORDER - STRUKTUR FIELD 'orders' KETAT */
 window.doUpload=async()=>{
     let gi=document.getElementById(selectedType==='Kirim Instan'?'f-pickup-loc':'f-delivery-loc');
     if(gi.dataset.valid==="false") return showToast('GPS lemah');
@@ -421,14 +380,15 @@ window.doUpload=async()=>{
     if(!pL||!pD||!dL||!dDe||!c||!cn||!cw||window.currentOrderFare===null) return showToast('Lengkapi data wajib (*)');
     if(window.waktuType==='Jadwalkan'&&!wj) return showToast('Atur waktu jadwal');
 
+    // IMPLEMENTASI SELURUH FIELD 'orders' SESUAI REKOMENDASI IOD & IPO (Driver akan mengisi getdriverId dll nantinya)
     const orderData = {
         createdAt: new Date().toISOString(),
         customerId: currentUserUid,
-        getdriverId: "",
+        getdriverId: "", // Driver Web akan mengisinya saat swipe/terima pesanan
         kategori: selectedType,
         mapsAmbil: pL,
         namaAmbil: pD,
-        mpasAntar: dL,
+        mpasAntar: dL, // Penamaan ketat "mpasAntar"
         NamaAntar: dDe,
         catatan: c,
         waktuAmbil: window.waktuType==='Jadwalkan' ? wj : 'Langsung',
@@ -436,21 +396,24 @@ window.doUpload=async()=>{
         waPenerima: cw,
         JarakTempuh: window.currentOrderDist,
         Argo: window.currentOrderFare,
+        // Informasi Order Driver (IOD) disiapkan kosong
         driverName: "",
         waDriver: "",
         sinceDriver: "",
         rankDriver: "",
         UrlprofileDriver: "",
         kendaraanDriver: "",
+        // Informasi Proses Order (IPO) disiapkan kosong
         titikAmbil: "",
         sharelocationDriver: "",
-        status: 'menunggu',
+        status: 'menunggu', // menunggu -> terima -> ambil -> ngantar -> tiba -> selesai (DIPROSES DRIVER)
         urlbuktiAmbil: "",
         urlbuktiSelesai: ""
     };
 
     document.getElementById('sfx-create').play().catch(()=>{});
     
+    // Clear Form
     ['f-pickup-loc','f-pickup-detail','f-delivery-loc','f-delivery-detail','f-catatan','f-waktu-jadwal','f-penerima-nama','f-penerima-wa','f-pengirim-nama','f-pengirim-wa','f-distance'].forEach(i=>{if(document.getElementById(i))document.getElementById(i).value='';});
     window.currentOrderDist=null; window.currentOrderFare=null;
     document.getElementById('display-fare').textContent='Rp 0';
@@ -465,57 +428,34 @@ window.doUpload=async()=>{
     finally{ hideLoading(); }
 };
 
-/* PEMANTAUAN PROSES - HANYA UNTUK PESANAN AKTIF (status bukan selesai/dibatalkan) */
+/* PEMANTAUAN PROSES & RUTE OSRM (REAL-TIME INTEGRATION) */
 function subscribeOrders(){
     if(unsubscribeOrders) unsubscribeOrders();
     if(!currentUserUid) return;
     
-    // Query hanya mengambil status yang belum final
-    const activeStatuses = ['menunggu', 'terima', 'ambil', 'ngantar', 'tiba'];
-    const q = query(collection(db,"orders"), where("customerId","==",currentUserUid), where("status","in",activeStatuses));
-    
-    unsubscribeOrders=onSnapshot(q, s=>{
-        let activeOrders=[];
-        s.forEach(d=>activeOrders.push({id:d.id, ...d.data()}));
-        activeOrders.sort((x,y)=>new Date(y.createdAt||0) - new Date(x.createdAt||0)); 
+    // Pemrosesan order murni sebagai viewer. Driver mengubah field via web driver.
+    unsubscribeOrders=onSnapshot(query(collection(db,"orders"), where("customerId","==",currentUserUid)), s=>{
+        let a=[];
+        s.forEach(d=>a.push({id:d.id, ...d.data()}));
+        a.sort((x,y)=>new Date(y.createdAt||0) - new Date(x.createdAt||0)); 
         
-        window.activeOrdersData = activeOrders;
+        window.activeOrdersData = a.filter(o=>o.status!=='selesai' && o.status!=='dibatalkan');
+        window.historyOrdersData = a.filter(o=>o.status==='selesai' || o.status==='dibatalkan');
         
-        // Deteksi perubahan status menjadi final (selesai/dibatalkan) tidak mungkin terjadi di snapshot ini,
-        // karena query hanya mengembalikan status aktif. Untuk menangkap pesanan yang menjadi final,
-        // kita perlu listener per dokumen atau memanfaatkan mekanisme lain.
-        // Karena driver akan mengubah status menjadi selesai, dan customer dapat membatalkan,
-        // kita akan menambahkan listener pada setiap dokumen aktif untuk mendeteksi perubahan menjadi final.
-        // Untuk setiap pesanan aktif, kita pasang listener individual jika belum ada.
-        window.activeOrdersData.forEach(order => {
-          if (!order._listenerAttached) {
-            order._listenerAttached = true;
-            const docRef = doc(db, "orders", order.id);
-            const unsub = onSnapshot(docRef, (docSnap) => {
-              const updated = docSnap.data();
-              if (updated && (updated.status === 'selesai' || updated.status === 'dibatalkan')) {
-                // Pesanan menjadi final, tambahkan ke cache
-                const finalOrder = { id: docSnap.id, ...updated };
-                addToLocalHistory(finalOrder);
-                // Hentikan listener karena sudah tidak diperlukan lagi
-                unsub();
-              }
-            });
-          }
-        });
-        
-        if(document.getElementById('page-proses').classList.contains('active')) window.renderProses();
-        
-        // Trigger arrival popup
         window.activeOrdersData.forEach(o=>{
+            // Menampilkan popup saat driver mengklik "tiba"
             if(o.status === 'tiba' && window.currentArrivalOrderId !== o.id && !diprosesSet.has(o.id + '_tiba')){
                 diprosesSet.add(o.id + '_tiba');
                 window.showArrivalPopup(o.id, o.Argo);
             }
         });
+        
+        if(document.getElementById('page-proses').classList.contains('active')) window.renderProses();
+        if(document.getElementById('page-archive').classList.contains('active')) window.renderArchive();
     });
 }
 
+// Fitur OSRM Route Fetcher
 async function drawRouteOSRM(map, startLngLat, endLngLat, routeId) {
     if(!startLngLat || !endLngLat) return;
     try {
@@ -541,11 +481,7 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId) {
 window.batalOrder=async id=>{
     if(!confirm('Yakin batalkan?')) return;
     showLoading('Membatalkan...');
-    try{ 
-      await updateDoc(doc(db,"orders",id), {status:'dibatalkan'}); 
-      // Setelah update, listener per dokumen akan mendeteksi dan menambahkan ke cache
-      showToast('Dibatalkan'); 
-    }
+    try{ await updateDoc(doc(db,"orders",id), {status:'dibatalkan'}); showToast('Dibatalkan'); }
     catch(e){ showToast('Gagal'); } finally{ hideLoading(); }
 };
 
@@ -564,6 +500,7 @@ window.renderProses=()=>{
         let step1='', step2='', step3='', step4='';
         let fillWidth='0%';
         
+        // Membaca status yang diupdate oleh Driver Web
         if(stat==='menunggu'){ step1='active'; fillWidth='15%'; }
         else if(stat==='terima' || stat==='ambil'){ step1='done'; step2='active'; fillWidth='35%'; }
         else if(stat==='ngantar'){ step1='done'; step2='done'; step3='active'; fillWidth='65%'; }
@@ -639,6 +576,7 @@ window.renderProses=()=>{
                 if(mEl && !mEl.dataset.initialized){
                     mEl.dataset.initialized="true";
                     
+                    // Ekstraksi rute berdasarkan mpasAntar (sebagai destinasi utama)
                     let targetCoords = exC(o.mpasAntar) || exC(o.mapsAmbil) || [110.421, -6.982]; 
                     
                     const map = new maplibregl.Map({
@@ -651,10 +589,12 @@ window.renderProses=()=>{
                     
                     window.mapInstances[o.id] = map;
                     
+                    // Marker Tujuan Customer (mpasAntar)
                     const elD = document.createElement('div');
                     elD.innerHTML='<div style="width:18px;height:18px;background:#4285F4;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.4);"></div>';
                     new maplibregl.Marker({element:elD}).setLngLat(targetCoords).addTo(map);
 
+                    // Marker Kendaraan Driver
                     const elM = document.createElement('div');
                     elM.innerHTML='<div style="background:#FFF;padding:5px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#202124;font-size:20px;">two_wheeler</span></div>';
                     const driverMarker = new maplibregl.Marker({element:elM}).setLngLat(targetCoords).addTo(map); 
@@ -662,6 +602,7 @@ window.renderProses=()=>{
                     
                     window.mapCenters[o.id] = () => map.flyTo({center: driverMarker.getLngLat(), zoom: 16});
                     
+                    // Inisiasi OSRM Routing jika titikAmbil dan status ngantar
                     map.on('load', ()=>{
                         let startPoint = exC(o.sharelocationDriver) || exC(o.titikAmbil);
                         if(startPoint && (o.status === 'ngantar' || o.status === 'tiba')){
@@ -670,6 +611,7 @@ window.renderProses=()=>{
                     });
                 }
                 
+                // Realtime Tracker Update: diperbarui otomatis berdasarkan sharelocationDriver
                 if(window.mapInstances[o.id] && window.currentDriverMarkers[o.id] && o.sharelocationDriver){
                     let dLoc = exC(o.sharelocationDriver);
                     if(dLoc){
@@ -720,12 +662,13 @@ window.confirmArrival=async()=>{
     const ringtone=document.getElementById('sfx-ringtone');
     ringtone.loop=false; ringtone.pause(); ringtone.currentTime=0;
     document.getElementById('arrival-modal').classList.remove('open');
+    // CATATAN: Customer TIDAK mengubah field "status" menjadi 'selesai'. 
+    // Pesanan hanya dipindahkan ke arsip ketika DRIVER mengubah status menjadi "selesai" (Sesuai instruksi)
 };
 
-// RENDER RIWAYAT DARI CACHE LOKAL
 window.renderArchive=()=>{
   const sv=document.getElementById('search-input').value.toLowerCase(), rs=document.getElementById('archive-results');
-  let f=window.localHistoryOrders.filter(e=>(e.namaPenerima||'Tanpa Nama').toLowerCase().includes(sv));
+  let f=window.historyOrdersData.filter(e=>(e.namaPenerima||'Tanpa Nama').toLowerCase().includes(sv));
   if(!f.length) return rs.innerHTML=`<div class="empty-state"><span class="material-symbols-outlined">receipt_long</span><p>Belum ada riwayat pesanan.</p></div>`;
   let h='';
   f.forEach(e=>{
@@ -768,7 +711,7 @@ window.getLocation=id=>{
     navigator.geolocation.getCurrentPosition(p=>{
         let ac=p.coords.accuracy, st='', c='', v=false;
         if(ac<=15){st='Sangat Tinggi';c='var(--green-dark)';v=true;} else if(ac<=50){st='Tinggi';c='var(--green)';v=true;} else if(ac<=150){st='Sedang';c='var(--amber)';v=false;} else{st='Lemah';c='var(--red)';v=false;}
-        let i=document.getElementById(id); i.value=`${p.coords.longitude.toFixed(6)}, ${p.coords.latitude.toFixed(6)}`; i.dataset.valid=v;
+        let i=document.getElementById(id); i.value=`${p.coords.longitude.toFixed(6)}, ${p.coords.latitude.toFixed(6)}`; i.dataset.valid=v; // OSRM/Maplibre prefer lng, lat structure for extraction reliability
         let aDiv=document.getElementById(id+'-accuracy'); if(aDiv){aDiv.innerHTML=`Akurasi GPS: <strong style="color:${c}">${st}</strong> (±${Math.round(ac)}m)`; aDiv.classList.remove('d-none');}
         showToast(!v?'Akurasi lemah, coba lagi':'Lokasi didapatkan');
     },()=>showToast('Gagal akses GPS'),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
@@ -803,6 +746,7 @@ window.selectType=(el,t)=>{
 function exC(str){ 
     if(!str) return null; 
     let m=str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/); 
+    // Mengamankan pembacaan Lng, Lat
     return m?[parseFloat(m[1]),parseFloat(m[2])]:null; 
 }
 
