@@ -124,9 +124,24 @@ input,textarea{user-select:auto;-webkit-user-select:auto}
 .info-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start}.info-row-text{font-size:14px;font-weight:500;color:var(--gray-600);line-height:1.5}
 .dancing-container{position:fixed;bottom:85px;left:16px;z-index:9999;pointer-events:none;display:none}
 .dancing-container img{width:80px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3))}
+
+/* --- CSS RADIAL BURST ANIMATION --- */
+@keyframes radialBurst {
+    0% { box-shadow: 0 0 0 0 rgba(6, 193, 103, 0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(6, 193, 103, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(6, 193, 103, 0); }
+}
+.tl-step.active .tl-dot {
+    background: var(--black);
+    color: var(--white);
+    animation: radialBurst 1.5s infinite; /* Animasi berjalan terus saat status aktif */
+}
+
 </style>
 </head>
 <body>
+<audio id="sfx-status-change" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+<audio id="sfx-progress-loop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" loop preload="auto"></audio>
 <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
 <audio id="sfx-create" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
 <audio id="sfx-ringtone" src="https://cdn.jsdelivr.net/gh/w3teal/awesome-ringtone/Sony/2013%20-%20Original.mp3" preload="auto"></audio>
@@ -243,6 +258,11 @@ window.currentArrivalOrderId = null;
 window.currentDriverMarkers = {};
 window.isPromoGacoan = false;
 
+// Tambahan Variabel Baru:
+window.prevOrderStats = {}; // Untuk melacak perubahan status (suara)
+window.etaIntervals = {}; // Untuk menyimpan interval hitung mundur ETA
+
+
 /* ========== 3. UI & UX HANDLERS (VISUAL VIEWPORT, CLICK SOUND, LOADING) ========== */
 if (window.visualViewport) {
   let initVwHeight = window.visualViewport.height;
@@ -263,6 +283,11 @@ function showLoading(t) { document.getElementById('loading-text').textContent = 
 function hideLoading() { document.getElementById('loading-overlay').classList.remove('visible'); }
 
 /* ========== 4. AUTENTIKASI DAN PROFIL ========== */
+// Tambahkan trigger loading saat DOM baru selesai dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    showLoading('Mengecek sesi login...');
+});
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUserUid = user.uid;
@@ -273,6 +298,7 @@ onAuthStateChanged(auth, async (user) => {
     if (unsubscribeOrders) unsubscribeOrders();
     document.getElementById('app').classList.remove('visible');
     document.getElementById('splash').classList.remove('hidden');
+    hideLoading(); // Sembunyikan loading jika belum login
   }
 });
 
@@ -294,8 +320,14 @@ async function checkUserProfile(user) {
     } else {
       document.getElementById('complete-profile-modal').classList.add('open');
     }
-  } catch (e) { showToast('Gagal memuat profil'); }
+  } catch (e) { 
+      showToast('Gagal memuat profil'); 
+  } finally {
+      hideLoading(); // Pastikan loading tertutup setelah pengecekan profil selesai
+  }
 }
+
+
 
 function updateUserAvatarUI(d) {
   const a = document.getElementById('user-avatar');
@@ -500,12 +532,11 @@ window.doUpload = async () => {
   showLoading('Membuat pesanan...');
   try {
     await addDoc(collection(db, "orders"), orderData);
-    showToast('Pesanan dibuat. Menunggu Driver...');
+    showToast('Pesanan berhasil dibuat.');
   } catch (e) { showToast('Gagal simpan pesanan: ' + e.message); }
   finally { hideLoading(); }
 };
 
-/* ========== 6. PEMANTAUAN ORDER DAN RENDER PROSES ========== */
 /* ========== 6. PEMANTAUAN ORDER DAN RENDER PROSES ========== */
 function subscribeOrders() {
   if (unsubscribeOrders) unsubscribeOrders();
@@ -516,8 +547,30 @@ function subscribeOrders() {
     s.forEach(d => a.push({ id: d.id, ...d.data() }));
     a.sort((x, y) => new Date(y.createdAt || 0) - new Date(x.createdAt || 0));
 
+    // --- FITUR SUARA: Perubahan Status Terima, Ambil, Ngantar ---
+    a.forEach(o => {
+      if (window.prevOrderStats[o.id] && window.prevOrderStats[o.id] !== o.status) {
+          if (['terima', 'ambil', 'ngantar'].includes(o.status)) {
+              let sfxStat = document.getElementById('sfx-status-change');
+              if(sfxStat) { sfxStat.currentTime = 0; sfxStat.play().catch(()=>{}); }
+          }
+      }
+      window.prevOrderStats[o.id] = o.status;
+    });
+
     window.activeOrdersData = a.filter(o => o.status !== 'selesai' && o.status !== 'dibatalkan');
     window.historyOrdersData = a.filter(o => o.status === 'selesai' || o.status === 'dibatalkan');
+
+    // --- FITUR SUARA: Loop Suara saat progress timeline menyala ---
+    let hasActiveProgress = window.activeOrdersData.some(o => ['menunggu', 'terima', 'ambil', 'ngantar'].includes(o.status));
+    let loopAudio = document.getElementById('sfx-progress-loop');
+    if (loopAudio) {
+        if (hasActiveProgress) {
+            if (loopAudio.paused) loopAudio.play().catch(()=>{});
+        } else {
+            loopAudio.pause();
+        }
+    }
 
     window.activeOrdersData.forEach(o => {
       if (o.status === 'tiba' && window.currentArrivalOrderId !== o.id && !diprosesSet.has(o.id + '_tiba')) {
@@ -531,6 +584,7 @@ function subscribeOrders() {
   });
 }
 
+
 async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
   if (!startLngLat || !endLngLat) return;
   try {
@@ -541,15 +595,29 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
       const geojson = data.routes[0].geometry;
       const durationSec = data.routes[0].duration; // Durasi asli dari OSRM
 
-      // G. Tambahan estimasi waktu cerdas berdasarkan kategori
       let tambahanWaktu = 0; // dalam detik
-      if (orderData.kategori === 'Jastip resto/toko') tambahanWaktu = 15 * 60; // +15 menit tunggu makanan
-      else if (orderData.kategori === 'Ambil Instan') tambahanWaktu = 5 * 60;  // +5 menit proses ambil
+      if (orderData.kategori === 'Jastip resto/toko') tambahanWaktu = 15 * 60; 
+      else if (orderData.kategori === 'Ambil Instan') tambahanWaktu = 5 * 60;  
 
-      let totalMenit = Math.round((durationSec + tambahanWaktu) / 60);
+      let totalDetik = Math.round(durationSec + tambahanWaktu);
       let etaEl = document.getElementById('eta-' + orderData.id);
+      
       if(etaEl) {
-          etaEl.innerText = `Estimasi Tiba: ${totalMenit} Menit`;
+          // Bersihkan interval sebelumnya jika map di-render ulang
+          if(window.etaIntervals[orderData.id]) clearInterval(window.etaIntervals[orderData.id]);
+          
+          // Mulai hitung mundur
+          window.etaIntervals[orderData.id] = setInterval(() => {
+              if (totalDetik <= 0) {
+                  clearInterval(window.etaIntervals[orderData.id]);
+                  etaEl.innerText = `Driver Segera Tiba!`;
+                  return;
+              }
+              let m = Math.floor(totalDetik / 60);
+              let s = totalDetik % 60;
+              etaEl.innerText = `Estimasi Tiba: ${m}m ${s}d`;
+              totalDetik--;
+          }, 1000); // Update setiap 1 detik
       }
 
       if (map.getSource(routeId)) {
@@ -565,6 +633,8 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
     }
   } catch (e) { console.error("Gagal load rute OSRM:", e); }
 }
+
+
 
 window.batalOrder = async id => {
   if (!confirm('Yakin batalkan?')) return;
