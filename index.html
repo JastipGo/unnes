@@ -236,9 +236,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, where, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const app = initializeApp({ apiKey: "AIzaSyDeAIeJYabLqzX8_lwBkDZE98EOc3-9lYY", authDomain: "arsipmrikanasin.firebaseapp.com", projectId: "arsipmrikanasin", storageBucket: "arsipmrikanasin.firebasestorage.app", messagingSenderId: "789371282298", appId: "1:789371282298:web:edc61d7bc00935fc22ecc3" });
+const app = initializeApp({ 
+  apiKey: "AIzaSyDv-jfV1lFxEbvQn9TcgLMz6dyeyaK0OMc", 
+  authDomain: "jastipunnes-3c2da.firebaseapp.com", 
+  projectId: "jastipunnes-3c2da", 
+  storageBucket: "jastipunnes-3c2da.firebasestorage.app", 
+  messagingSenderId: "859733685114", 
+  appId: "1:859733685114:web:d2ed8819b09b6b24939cc3" 
+});
 const auth = getAuth(app), db = getFirestore(app), googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ client_id: '789371282298-jju2gdn42r0s8n2sr1h241r9lb1ogqnp.apps.googleusercontent.com' });
+googleProvider.setCustomParameters({ client_id: '859733685114-ccvi486o28h48nlvccie8glqulust2ic.apps.googleusercontent.com' });
+
 
 /* ========== 2. VARIABEL GLOBAL ========== */
 let currentUserUid = '', currentUserEmail = '', currentUserData = null;
