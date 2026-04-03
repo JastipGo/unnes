@@ -2126,11 +2126,49 @@ window.doUpload = async () => {
     c = document.getElementById('f-catatan').value.trim(),
     wj = document.getElementById('f-waktu-jadwal').value;
 
-  let cn = document.getElementById(selectedType === 'Kirim Instan' ? 'f-pengirim-nama' : 'f-penerima-nama').value.trim(),
-    cw = document.getElementById(selectedType === 'Kirim Instan' ? 'f-pengirim-wa' : 'f-penerima-wa').value.trim();
+  let idNama = selectedType === 'Kirim Instan' ? 'f-pengirim-nama' : 'f-penerima-nama';
+  let idWa = selectedType === 'Kirim Instan' ? 'f-pengirim-wa' : 'f-penerima-wa';
 
-  if (!pL || !pD || !dL || !dDe || !c || !cn || !cw || window.currentOrderFare === null) return showToast('Lengkapi data wajib (*)');
-  if (window.waktuType === 'Jadwalkan' && !wj) return showToast('Atur waktu jadwal');
+  let cn = document.getElementById(idNama).value.trim(),
+    cw = document.getElementById(idWa).value.trim();
+
+  // --- MODIFIKASI: Pengecekan field kosong & auto-scroll ---
+  const requiredFields = [
+    { id: 'f-pickup-loc', val: pL },
+    { id: 'f-pickup-detail', val: pD },
+    { id: 'f-delivery-loc', val: dL },
+    { id: 'f-delivery-detail', val: dDe },
+    { id: 'f-catatan', val: c },
+    { id: idNama, val: cn },
+    { id: idWa, val: cw }
+  ];
+
+  if (window.waktuType === 'Jadwalkan') {
+    requiredFields.push({ id: 'f-waktu-jadwal', val: wj });
+  }
+
+  // Cari field pertama yang masih kosong
+  let firstEmptyField = requiredFields.find(field => !field.val);
+
+  if (firstEmptyField) {
+    let el = document.getElementById(firstEmptyField.id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.focus();
+    }
+    return showToast('Lengkapi data wajib (*)');
+  }
+
+  // Pengecekan khusus untuk Jarak / Argo
+  if (window.currentOrderFare === null) {
+    let elDist = document.getElementById('f-distance');
+    if (elDist) {
+      elDist.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      elDist.focus();
+    }
+    return showToast('Lengkapi jarak/argo pesanan (*)');
+  }
+  // --- AKHIR MODIFIKASI ---
 
   if (window.jenisOngkir === 'Nebeng' && pL !== '-7.047365,110.420778') {
     window.setOngkir('Normal');
@@ -2195,6 +2233,7 @@ window.doUpload = async () => {
   } catch (e) { showToast('Gagal simpan pesanan: ' + e.message); }
   finally { hideLoading(); }
 };
+
 
 /* ========== PEMANTAUAN ORDER ========== */
 function subscribeOrders() {
