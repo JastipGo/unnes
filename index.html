@@ -5,52 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>JastipUnnes - Customer</title>
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=SamsungOne:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
 <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <style>
 /* ============================================================
-   ONE UI SAMSUNG — DESIGN SYSTEM
-   Ref: One UI 6/7, Samsung Internet, Galaxy Themes
+   ONE UI SAMSUNG — DESIGN SYSTEM (Pure One UI, no Uber vibes)
    ============================================================ */
 :root {
-  /* Brand Colors */
   --oneui-blue: #1259C3;
   --oneui-blue-light: #3478F6;
   --oneui-blue-bg: #EBF1FD;
   --oneui-blue-dark: #0A3D8F;
-
-  /* Semantic */
   --oneui-red: #C9373C;
   --oneui-red-bg: #FDECEA;
   --oneui-green: #0E7A45;
   --oneui-green-bg: #E6F5ED;
   --oneui-orange: #E07B00;
   --oneui-orange-bg: #FEF3E2;
-
-  /* Surfaces */
-  --surface-bg: #F5F5F5;
+  --surface-bg: #F2F2F7;
   --surface-card: #FFFFFF;
   --surface-input: #F1F3F5;
   --surface-input-focus: #FFFFFF;
   --surface-secondary: #FAFAFA;
-
-  /* Text */
   --text-primary: #1A1A1A;
   --text-secondary: #5A5A5A;
   --text-tertiary: #8A8A8A;
   --text-disabled: #BBBBBB;
   --text-on-blue: #FFFFFF;
-
-  /* Borders */
   --border-light: #E8E8E8;
   --border-medium: #D0D0D0;
   --border-input: #C8C8C8;
   --border-focus: var(--oneui-blue);
-
-  /* Radius — khas One UI sangat rounded */
   --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 16px;
@@ -58,15 +45,11 @@
   --r-xl: 28px;
   --r-2xl: 36px;
   --r-full: 100px;
-
-  /* Shadows — One UI subtle */
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
   --shadow-blue: 0 4px 16px rgba(18,89,195,0.25);
-
-  /* Typography */
-  --font: 'Noto Sans KR', 'SamsungOne', -apple-system, sans-serif;
+  --font: 'Noto Sans KR', -apple-system, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -115,29 +98,31 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
 }
 
 /* ============================================================
-   TOAST — One UI snackbar style
+   TOAST — One UI style, TOP position, more transparent
    ============================================================ */
 #toast {
   position: fixed;
-  bottom: 90px;
+  top: 60px;
   left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: #2A2A2A;
-  color: #FFF;
-  padding: 13px 22px;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(30, 30, 30, 0.72);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  color: rgba(255,255,255,0.95);
+  padding: 12px 22px;
   border-radius: var(--r-full);
   font-size: 13px;
   font-weight: 600;
   z-index: 10001;
   display: none;
   align-items: center;
-  white-space: nowrap;
-  box-shadow: var(--shadow-lg);
-  opacity: 0;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  max-width: calc(100vw - 40px);
   white-space: normal;
   text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.07) inset;
+  border: 1px solid rgba(255,255,255,0.12);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  max-width: calc(100vw - 40px);
 }
 #toast.show {
   display: flex;
@@ -168,11 +153,11 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   overflow-y: auto;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from { transform: translateY(100%); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
 }
 .modal-handle {
   width: 40px; height: 4px;
@@ -230,6 +215,11 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   justify-content: center;
   margin-bottom: 20px;
   box-shadow: var(--shadow-blue);
+  animation: popIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 .splash-logo-wrap .material-symbols-outlined {
   font-size: 36px;
@@ -241,6 +231,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   color: var(--text-primary);
   letter-spacing: -1px;
   line-height: 1;
+  animation: fadeUp 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both;
 }
 .splash-wordmark span { color: var(--oneui-blue); }
 .splash-tagline {
@@ -250,9 +241,13 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   margin-top: 8px;
   text-align: center;
   letter-spacing: 0.01em;
+  animation: fadeUp 0.5s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes fadeUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Auth Sheet */
 .auth-sheet {
   width: 100%;
   max-width: 520px;
@@ -260,6 +255,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   border-radius: var(--r-2xl) var(--r-2xl) 0 0;
   padding: 12px 22px env(safe-area-inset-bottom, 32px);
   box-shadow: 0 -4px 24px rgba(0,0,0,0.07);
+  animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
 }
 .auth-handle {
   width: 40px; height: 4px;
@@ -267,8 +263,6 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   border-radius: var(--r-full);
   margin: 0 auto 20px;
 }
-
-/* Tab Row */
 .auth-tabs {
   display: flex;
   gap: 0;
@@ -295,7 +289,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
 }
 
 /* ============================================================
-   FORM FIELDS — One UI Input Style
+   FORM FIELDS
    ============================================================ */
 .field-wrap { margin-bottom: 12px; }
 .field-label {
@@ -317,13 +311,14 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   font-size: 15px;
   font-weight: 400;
   color: var(--text-primary);
-  transition: all 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
   -webkit-appearance: none;
 }
 .field:focus {
   border-color: var(--oneui-blue);
   background: var(--surface-input-focus);
   box-shadow: 0 0 0 3px rgba(18,89,195,0.12) !important;
+  transform: translateY(-1px);
 }
 .field:disabled, .field[readonly] {
   background: var(--surface-input);
@@ -332,7 +327,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
 textarea.field { resize: none; line-height: 1.5; }
 
 /* ============================================================
-   BUTTONS — One UI Samsung Pill/Rounded
+   BUTTONS — One UI Samsung Pill
    ============================================================ */
 .btn-primary, .btn-secondary, .btn-blue, .btn-outline-blue {
   width: 100%;
@@ -343,19 +338,25 @@ textarea.field { resize: none; line-height: 1.5; }
   font-family: var(--font);
   font-size: 15px;
   font-weight: 700;
-  transition: all 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   letter-spacing: -0.2px;
   -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
 }
 .btn-primary {
   background: var(--oneui-blue);
   color: #FFF;
 }
-.btn-primary:active { background: var(--oneui-blue-dark); transform: scale(0.98); }
+.btn-primary:active {
+  background: var(--oneui-blue-dark);
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(18,89,195,0.3);
+}
 .btn-primary:disabled {
   background: var(--border-light);
   color: var(--text-disabled);
@@ -366,7 +367,7 @@ textarea.field { resize: none; line-height: 1.5; }
   color: var(--text-primary);
   margin-top: 10px;
 }
-.btn-secondary:active { background: var(--border-light); transform: scale(0.98); }
+.btn-secondary:active { background: var(--border-light); transform: scale(0.97); }
 
 .btn-outline-blue {
   background: transparent;
@@ -374,7 +375,7 @@ textarea.field { resize: none; line-height: 1.5; }
   border: 1.5px solid var(--oneui-blue) !important;
   margin-top: 10px;
 }
-.btn-outline-blue:active { background: var(--oneui-blue-bg); }
+.btn-outline-blue:active { background: var(--oneui-blue-bg); transform: scale(0.97); }
 
 .btn-google {
   background: var(--surface-card);
@@ -450,7 +451,9 @@ textarea.field { resize: none; line-height: 1.5; }
   overflow: hidden;
   cursor: pointer;
   border: 1.5px solid var(--border-light);
+  transition: transform 0.18s ease;
 }
+.avatar:active { transform: scale(0.92); }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .icon-btn {
@@ -463,7 +466,9 @@ textarea.field { resize: none; line-height: 1.5; }
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
+  transition: all 0.18s ease;
 }
+.icon-btn:active { transform: scale(0.92); background: var(--border-light); }
 .icon-btn .material-symbols-outlined { font-size: 18px; }
 
 /* ============================================================
@@ -495,10 +500,9 @@ textarea.field { resize: none; line-height: 1.5; }
 }
 .nav-item.active { color: var(--oneui-blue); }
 .nav-item .label { font-size: 11px; font-weight: 600; }
-.nav-item .material-symbols-outlined { font-size: 22px; transition: transform 0.2s ease; }
-.nav-item.active .material-symbols-outlined { transform: scale(1.1); }
+.nav-item .material-symbols-outlined { font-size: 22px; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+.nav-item.active .material-symbols-outlined { transform: scale(1.15) translateY(-1px); }
 
-/* Active indicator pill */
 .nav-active-bar {
   position: absolute;
   top: 0;
@@ -509,9 +513,9 @@ textarea.field { resize: none; line-height: 1.5; }
   border-radius: 0 0 3px 3px;
   background: var(--oneui-blue);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, width 0.25s cubic-bezier(0.34,1.56,0.64,1);
 }
-.nav-item.active .nav-active-bar { opacity: 1; }
+.nav-item.active .nav-active-bar { opacity: 1; width: 36px; }
 
 /* ============================================================
    CONTENT AREA
@@ -527,12 +531,13 @@ textarea.field { resize: none; line-height: 1.5; }
   width: 100%;
 }
 .page { display: none; }
-.page.active { display: block; }
-
-/* Page Header — One UI Large Title */
-.page-header {
-  padding: 24px 20px 4px;
+.page.active { display: block; animation: pageIn 0.28s cubic-bezier(0.4,0,0.2,1) both; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+
+.page-header { padding: 24px 20px 4px; }
 .page-title {
   font-size: 26px;
   font-weight: 700;
@@ -547,6 +552,40 @@ textarea.field { resize: none; line-height: 1.5; }
 }
 
 /* ============================================================
+   PAGE HEADER PROSES with refresh button
+   ============================================================ */
+.page-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 20px 4px;
+}
+.page-header-row .page-title { font-size: 26px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.8px; }
+.page-header-row .page-sub { font-size: 13px; font-weight: 400; color: var(--text-tertiary); margin-top: 4px; }
+
+.refresh-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-input);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--oneui-blue);
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  flex-shrink: 0;
+  margin-top: 20px;
+}
+.refresh-btn:active { background: var(--oneui-blue-bg); transform: scale(0.92); }
+.refresh-btn .material-symbols-outlined { font-size: 20px; }
+@keyframes rotateRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.refresh-btn.spin .material-symbols-outlined { animation: rotateRefresh 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* ============================================================
    CARDS — One UI Rounded Card
    ============================================================ */
 .card {
@@ -555,6 +594,17 @@ textarea.field { resize: none; line-height: 1.5; }
   border-radius: var(--r-xl);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  animation: cardIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+.card:nth-child(1) { animation-delay: 0ms; }
+.card:nth-child(2) { animation-delay: 40ms; }
+.card:nth-child(3) { animation-delay: 80ms; }
+.card:nth-child(4) { animation-delay: 120ms; }
+.card:nth-child(5) { animation-delay: 160ms; }
+.card:nth-child(6) { animation-delay: 200ms; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .card-header {
   display: flex;
@@ -619,7 +669,7 @@ textarea.field { resize: none; line-height: 1.5; }
   width: 5px; height: 5px;
   border-radius: 50%;
   background: rgba(255,255,255,0.45);
-  transition: all 0.3s;
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
 }
 .banner-dots .dot.active {
   background: #FFF;
@@ -628,7 +678,7 @@ textarea.field { resize: none; line-height: 1.5; }
 }
 
 /* ============================================================
-   SERVICE CHIPS — One UI Style
+   SERVICE CHIPS
    ============================================================ */
 .chips-wrap {
   display: flex;
@@ -647,13 +697,15 @@ textarea.field { resize: none; line-height: 1.5; }
   display: flex;
   align-items: center;
   gap: 5px;
-  transition: all 0.18s ease;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
 }
-.chip:active { transform: scale(0.97); }
+.chip:active { transform: scale(0.94); }
 .chip.selected {
   background: var(--oneui-blue);
   border-color: var(--oneui-blue);
   color: #FFF;
+  box-shadow: var(--shadow-blue);
+  transform: scale(1.03);
 }
 
 /* ============================================================
@@ -680,7 +732,7 @@ textarea.field { resize: none; line-height: 1.5; }
 }
 
 /* ============================================================
-   FARE DISPLAY — One UI Info Card
+   FARE DISPLAY
    ============================================================ */
 .fare-display {
   background: var(--oneui-blue);
@@ -690,9 +742,71 @@ textarea.field { resize: none; line-height: 1.5; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.fare-display.fare-updated {
+  animation: farePopIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes farePopIn {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 .fare-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); }
-.fare-amount { font-size: 26px; font-weight: 700; color: #FFF; letter-spacing: -0.8px; }
+.fare-amount { font-size: 26px; font-weight: 700; color: #FFF; letter-spacing: -0.8px; transition: all 0.25s ease; }
+
+/* ============================================================
+   PAYMENT METHOD SELECTOR
+   ============================================================ */
+.payment-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.payment-option {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 10px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--border-light);
+  background: var(--surface-input);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: var(--font);
+}
+.payment-option:active { transform: scale(0.96); }
+.payment-option.selected {
+  background: var(--oneui-blue-bg);
+  border-color: var(--oneui-blue);
+  transform: scale(1.03);
+}
+.payment-option .pay-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--surface-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid var(--border-light);
+}
+.payment-option.selected .pay-icon {
+  background: var(--oneui-blue);
+  border-color: var(--oneui-blue);
+}
+.payment-option.selected .pay-icon .material-symbols-outlined { color: #FFF !important; }
+.payment-option .pay-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.payment-option.selected .pay-label { color: var(--oneui-blue); }
+.payment-option .pay-icon .material-symbols-outlined { font-size: 16px; color: var(--text-secondary); }
 
 /* ============================================================
    TOGGLE BUTTONS (Waktu / Ongkir)
@@ -716,13 +830,34 @@ textarea.field { resize: none; line-height: 1.5; }
   cursor: pointer;
   color: var(--text-tertiary);
   background: transparent;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
 }
 .toggle-btn.active {
   background: var(--surface-card);
   color: var(--oneui-blue);
   box-shadow: var(--shadow-sm);
+  transform: scale(1.02);
 }
+
+/* Promo Gacoan locked fields */
+.field-locked {
+  background: rgba(18,89,195,0.05) !important;
+  border-color: rgba(18,89,195,0.2) !important;
+  color: var(--text-secondary) !important;
+}
+.gacoan-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--oneui-blue);
+  background: var(--oneui-blue-bg);
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  margin-top: 5px;
+}
+.gacoan-lock-badge .material-symbols-outlined { font-size: 12px; }
 
 /* ============================================================
    SEARCH BAR
@@ -736,6 +871,11 @@ textarea.field { resize: none; line-height: 1.5; }
   padding: 4px 16px;
   box-shadow: var(--shadow-sm);
   border: 1.5px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+.search-bar:focus-within {
+  border-color: var(--oneui-blue);
+  box-shadow: 0 0 0 3px rgba(18,89,195,0.1);
 }
 .search-bar input {
   flex: 1;
@@ -759,7 +899,7 @@ textarea.field { resize: none; line-height: 1.5; }
 .search-clear.visible { display: block; }
 
 /* ============================================================
-   ORDER CARD — Active Orders (Proses)
+   ORDER CARD
    ============================================================ */
 .order-card {
   background: var(--surface-card);
@@ -767,7 +907,10 @@ textarea.field { resize: none; line-height: 1.5; }
   border-radius: var(--r-xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+  animation: cardIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+  transition: box-shadow 0.2s ease;
 }
+.order-card:active { box-shadow: var(--shadow-md); }
 .order-card-header {
   padding: 16px 18px;
   display: flex;
@@ -775,7 +918,9 @@ textarea.field { resize: none; line-height: 1.5; }
   align-items: flex-start;
   cursor: pointer;
   border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s ease;
 }
+.order-card-header:active { background: var(--surface-secondary); }
 .order-card-num {
   font-size: 15px;
   font-weight: 700;
@@ -789,7 +934,6 @@ textarea.field { resize: none; line-height: 1.5; }
   margin-top: 2px;
 }
 
-/* Status Pill */
 .status-pill {
   font-size: 11px;
   font-weight: 700;
@@ -804,7 +948,7 @@ textarea.field { resize: none; line-height: 1.5; }
 
 .order-card-body { padding: 16px 18px; }
 
-/* Timeline — One UI Step Progress */
+/* Timeline */
 .timeline-oneui {
   display: flex;
   align-items: flex-start;
@@ -825,8 +969,8 @@ textarea.field { resize: none; line-height: 1.5; }
 .tl-fill {
   height: 100%;
   border-radius: var(--r-full);
-  background: var(--oneui-blue);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, var(--oneui-blue-dark), var(--oneui-blue-light));
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .tl-step {
   position: relative;
@@ -845,7 +989,7 @@ textarea.field { resize: none; line-height: 1.5; }
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
 }
 .tl-dot .material-symbols-outlined { font-size: 16px; color: var(--text-tertiary); }
 .tl-step.active .tl-dot {
@@ -853,6 +997,7 @@ textarea.field { resize: none; line-height: 1.5; }
   border-color: var(--oneui-blue);
   box-shadow: 0 0 0 4px rgba(18,89,195,0.15) !important;
   animation: pulseDot 1.8s infinite;
+  transform: scale(1.1);
 }
 .tl-step.active .tl-dot .material-symbols-outlined { color: #FFF; }
 .tl-step.done .tl-dot {
@@ -873,7 +1018,6 @@ textarea.field { resize: none; line-height: 1.5; }
 .tl-step.active .tl-label { color: var(--oneui-blue); font-weight: 700; }
 .tl-step.done .tl-label { color: var(--oneui-blue); }
 
-/* Toggle Detail Button */
 .toggle-detail-btn {
   display: flex;
   align-items: center;
@@ -888,13 +1032,19 @@ textarea.field { resize: none; line-height: 1.5; }
   background: none;
   width: 100%;
   font-family: var(--font);
+  transition: color 0.15s ease;
 }
+.toggle-detail-btn:active { color: var(--oneui-blue); }
 
-/* Order Detail Panel */
 .order-detail-panel {
   padding: 16px 18px 18px;
   border-top: 1px solid var(--border-light);
   background: var(--surface-secondary);
+  animation: panelOpen 0.3s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes panelOpen {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Driver Card */
@@ -907,10 +1057,10 @@ textarea.field { resize: none; line-height: 1.5; }
   border-radius: var(--r-lg);
   margin-bottom: 12px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
   border: 1.5px solid var(--border-light);
 }
-.driver-card:active { background: var(--surface-input); }
+.driver-card:active { background: var(--surface-input); transform: scale(0.98); }
 .driver-card img {
   width: 44px; height: 44px;
   border-radius: 50%;
@@ -929,7 +1079,6 @@ textarea.field { resize: none; line-height: 1.5; }
   gap: 3px;
 }
 
-/* Detail Grid */
 .detail-grid {
   background: var(--surface-card);
   border-radius: var(--r-lg);
@@ -965,6 +1114,7 @@ textarea.field { resize: none; line-height: 1.5; }
   border-radius: var(--r-xl);
   padding: 16px 18px;
   box-shadow: var(--shadow-sm);
+  animation: cardIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
 }
 
 .archive-icon-wrap {
@@ -1005,6 +1155,7 @@ textarea.field { resize: none; line-height: 1.5; }
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
+  animation: popIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
 }
 .empty-state-icon .material-symbols-outlined { font-size: 32px; color: var(--text-tertiary); }
 .empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text-secondary); }
@@ -1037,12 +1188,12 @@ textarea.field { resize: none; line-height: 1.5; }
   margin-bottom: 10px;
   cursor: pointer;
   border: 1.5px solid var(--border-light);
-  transition: background 0.15s;
+  transition: all 0.18s ease;
 }
-.profile-info-row:active { background: var(--border-light); }
+.profile-info-row:active { background: var(--border-light); transform: scale(0.99); }
 
 /* ============================================================
-   INFO LIST (Modal Info)
+   INFO LIST
    ============================================================ */
 .info-list { list-style: none; margin-bottom: 20px; }
 .info-list li {
@@ -1100,9 +1251,9 @@ textarea.field { resize: none; line-height: 1.5; }
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
 }
-.field-action-btn:active { background: var(--oneui-blue-dark); }
+.field-action-btn:active { background: var(--oneui-blue-dark); transform: scale(0.93); }
 .field-action-btn .material-symbols-outlined { font-size: 20px; }
 .field-action-btn.ghost {
   background: var(--surface-input);
@@ -1130,7 +1281,7 @@ textarea.field { resize: none; line-height: 1.5; }
   font-family: var(--font);
   font-size: 14px;
   font-weight: 700;
-  transition: all 0.18s ease;
+  transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1139,9 +1290,9 @@ textarea.field { resize: none; line-height: 1.5; }
   color: #FFF;
   text-decoration: none;
 }
-.btn-whatsapp:active { background: #1DA851; }
+.btn-whatsapp:active { background: #1DA851; transform: scale(0.97); }
 
-/* ETA Pill in map */
+/* ETA Pill */
 .eta-pill {
   position: absolute;
   top: 10px; left: 10px;
@@ -1155,7 +1306,6 @@ textarea.field { resize: none; line-height: 1.5; }
   box-shadow: var(--shadow-md);
 }
 
-/* Center map button */
 .map-center-btn {
   position: absolute;
   bottom: 10px; right: 10px;
@@ -1181,6 +1331,28 @@ textarea.field { resize: none; line-height: 1.5; }
   display: none;
 }
 .dancing-container img { width: 80px; }
+
+/* ============================================================
+   SATISFYING BUTTON RIPPLE ANIMATION
+   ============================================================ */
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  width: 20px; height: 20px;
+  margin-top: -10px; margin-left: -10px;
+  animation: ripple 0.5s linear;
+  pointer-events: none;
+}
+
+/* ============================================================
+   MICRO INTERACTIONS
+   ============================================================ */
+.field-wrap { transition: all 0.2s ease; }
+select.field { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238A8A8A'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 </style>
 </head>
 <body>
@@ -1331,7 +1503,7 @@ textarea.field { resize: none; line-height: 1.5; }
     <div style="width:56px; height:56px; background:var(--oneui-orange-bg); border-radius:var(--r-lg); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:28px;">🍜</div>
     <div class="modal-title">Pesan Gacoan Sekarang?</div>
     <p style="margin:8px 0 20px; font-size:14px; color:var(--text-secondary); line-height:1.6;">
-      Layanan otomatis diatur ke <strong>Jastip Resto</strong>. Lokasi pengambilan akan langsung diisi Mie Gacoan Setiabudi.
+      Layanan otomatis diatur ke <strong>Jastip Resto</strong>. Lokasi pengambilan akan langsung diisi Mie Gacoan Setiabudi. Kolom pengambilan & titik pengambilan akan dikunci otomatis.
     </p>
     <button class="btn-primary" onclick="window.applyPromo()">Pesan Sekarang</button>
     <button class="btn-secondary" onclick="window.closePromoModal()">Nanti Saja</button>
@@ -1475,10 +1647,12 @@ textarea.field { resize: none; line-height: 1.5; }
             </button>
           </div>
           <div id="f-pickup-loc-accuracy" class="accuracy-tag d-none"></div>
+          <div id="pickup-lock-badge" class="d-none"><span class="gacoan-lock-badge"><span class="material-symbols-outlined">lock</span>Dikunci oleh Promo Gacoan</span></div>
         </div>
         <div class="field-wrap" style="margin-bottom:0">
           <label class="field-label">Nama Tempat / Patokan <span class="field-required">*</span></label>
           <input class="field" id="f-pickup-detail" type="text" placeholder="Detail Toko / Lokasi Pengambilan">
+          <div id="pickup-detail-lock-badge" class="d-none"><span class="gacoan-lock-badge"><span class="material-symbols-outlined">lock</span>Dikunci oleh Promo Gacoan</span></div>
         </div>
       </div>
 
@@ -1573,6 +1747,25 @@ textarea.field { resize: none; line-height: 1.5; }
             <div class="card-subtitle-text">Kalkulasi argo otomatis</div>
           </div>
         </div>
+        
+        
+                <!-- NEW: Metode Pembayaran -->
+        <div class="field-wrap" style="margin-bottom:0">
+          <label class="field-label">Metode Pembayaran <span class="field-required">*</span></label>
+          <div class="payment-group" id="payment-group">
+            <div class="payment-option selected" onclick="window.selectPayment(this,'COD')" id="pay-cod">
+              <div class="pay-icon"><span class="material-symbols-outlined">payments</span></div>
+              <div class="pay-label">COD</div>
+            </div>
+            <div class="payment-option" onclick="window.selectPayment(this,'Transfer')" id="pay-transfer">
+              <div class="pay-icon"><span class="material-symbols-outlined">account_balance</span></div>
+              <div class="pay-label">Transfer</div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
         <div class="field-wrap">
           <label class="field-label">Jenis Ongkir <span class="field-required">*</span></label>
           <div class="toggle-group">
@@ -1580,7 +1773,10 @@ textarea.field { resize: none; line-height: 1.5; }
             <button class="toggle-btn" id="btn-ongkir-nebeng" onclick="window.setOngkir('Nebeng')">Nebeng</button>
           </div>
         </div>
-        <div class="field-wrap" style="margin-bottom:0">
+        
+        
+        
+        <div class="field-wrap">
           <label class="field-label">Jarak Tempuh (KM) <span class="field-required">*</span></label>
           <div class="field-with-btn">
             <input class="field" id="f-distance" type="number" step="0.1" min="0" placeholder="0.0" oninput="window.calculateArgoManual()">
@@ -1589,7 +1785,9 @@ textarea.field { resize: none; line-height: 1.5; }
             </button>
           </div>
         </div>
-        <div class="fare-display" style="margin-top:14px;">
+        
+        
+        <div class="fare-display" style="margin-top:14px;" id="fare-display-box">
           <div>
             <div class="fare-label">Total Argo / Tarif</div>
           </div>
@@ -1607,9 +1805,14 @@ textarea.field { resize: none; line-height: 1.5; }
 
     <!-- PAGE: Proses -->
     <div class="page" id="page-proses">
-      <div class="page-header">
-        <div class="page-title">Pesanan Aktif</div>
-        <div class="page-sub">Pantau pesanan yang sedang diproses</div>
+      <div class="page-header-row">
+        <div>
+          <div class="page-title">Pesanan Aktif</div>
+          <div class="page-sub">Pantau pesanan yang sedang diproses</div>
+        </div>
+        <button class="refresh-btn" id="refresh-proses-btn" onclick="window.refreshProses()" title="Refresh">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
       </div>
       <div id="proses-results"></div>
     </div>
@@ -1659,7 +1862,7 @@ textarea.field { resize: none; line-height: 1.5; }
 <div id="toast"><span id="toast-msg">OK</span></div>
 
 <!-- ============================================================
-     FIREBASE + LOGIC (BACKEND TIDAK DIUBAH)
+     FIREBASE + LOGIC
      ============================================================ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -1677,7 +1880,7 @@ const app = initializeApp({
 const auth = getAuth(app), db = getFirestore(app), googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ client_id: '859733685114-ccvi486o28h48nlvccie8glqulust2ic.apps.googleusercontent.com' });
 
-/* ========== 2. VARIABEL GLOBAL ========== */
+/* ========== VARIABEL GLOBAL ========== */
 let currentUserUid = '', currentUserEmail = '', currentUserData = null;
 let selectedType = 'Jastip resto/toko';
 window.activeOrdersData = [];
@@ -1688,6 +1891,7 @@ window.currentOrderFare = null;
 window.isRegistering = false;
 window.waktuType = 'Langsung';
 window.jenisOngkir = 'Normal';
+window.selectedPayment = 'COD'; // NEW: default payment
 window.mapInstances = {};
 window.mapCenters = {};
 window.arrivalRingInterval = null;
@@ -1697,7 +1901,7 @@ window.isPromoGacoan = false;
 window.prevOrderStats = {};
 window.etaIntervals = {};
 
-/* ========== 3. UI & UX HANDLERS ========== */
+/* ========== UI & UX HANDLERS ========== */
 if (window.visualViewport) {
   let initVwHeight = window.visualViewport.height;
   window.visualViewport.addEventListener('resize', () => {
@@ -1707,16 +1911,30 @@ if (window.visualViewport) {
   });
 }
 document.addEventListener('contextmenu', e => { if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault(); });
+
+// Ripple effect on buttons
 document.addEventListener('click', e => {
-  if (e.target.closest('.chip,.nav-item,.auth-tab,.order-card-header,.btn-primary,.btn-secondary,.btn-outline-blue,.icon-btn,.toggle-btn,.driver-card') || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+  const target = e.target.closest('.btn-primary,.btn-secondary,.btn-outline-blue,.chip,.nav-item,.toggle-btn,.payment-option,.auth-tab,.driver-card');
+  if (target) {
     const a = document.getElementById('sfx-click'); if (a) { a.currentTime = 0; a.play().catch(() => {}); }
+    // Add ripple
+    if (target.style.overflow === '' || target.style.overflow === 'hidden' || getComputedStyle(target).overflow === 'hidden') return;
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple-effect';
+    ripple.style.left = (e.clientX - rect.left) + 'px';
+    ripple.style.top = (e.clientY - rect.top) + 'px';
+    target.style.position = 'relative';
+    target.style.overflow = 'hidden';
+    target.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 500);
   }
 });
 
 function showLoading(t) { document.getElementById('loading-text').textContent = t; document.getElementById('loading-overlay').classList.add('visible'); }
 function hideLoading() { document.getElementById('loading-overlay').classList.remove('visible'); }
 
-/* ========== 4. AUTENTIKASI DAN PROFIL ========== */
+/* ========== AUTENTIKASI ========== */
 document.addEventListener('DOMContentLoaded', () => { showLoading('Mengecek sesi login...'); });
 
 onAuthStateChanged(auth, async (user) => {
@@ -1873,6 +2091,7 @@ window.previewAvatar = e => {
   };
   r.readAsDataURL(f);
 };
+
 window.doLogout = () => {
   signOut(auth);
   document.getElementById('login-user').value = '';
@@ -1880,7 +2099,14 @@ window.doLogout = () => {
   currentUserData = null;
 };
 
-/* ========== 5. MEMBUAT PESANAN ========== */
+/* ========== NEW: PAYMENT SELECTOR ========== */
+window.selectPayment = (el, method) => {
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  window.selectedPayment = method;
+};
+
+/* ========== MEMBUAT PESANAN ========== */
 window.doUpload = async () => {
   let gi = document.getElementById(selectedType === 'Kirim Instan' ? 'f-pickup-loc' : 'f-delivery-loc');
   if (gi.dataset.valid === "false") return showToast('GPS lemah');
@@ -1910,6 +2136,7 @@ window.doUpload = async () => {
     kategori: selectedType,
     jenisOngkir: window.jenisOngkir,
     jenisOrder: window.jenisOngkir === 'Nebeng' ? 'gabungan' : 'normal',
+    pembayaran: window.selectedPayment, // NEW field
     mapsAmbil: pL,
     namaAmbil: pD,
     mpasAntar: dL,
@@ -1941,6 +2168,12 @@ window.doUpload = async () => {
   document.getElementById('f-pickup-loc-accuracy').classList.add('d-none');
   document.getElementById('f-delivery-loc-accuracy').classList.add('d-none');
 
+  // Reset gacoan lock badges
+  document.getElementById('pickup-lock-badge').classList.add('d-none');
+  document.getElementById('pickup-detail-lock-badge').classList.add('d-none');
+  document.getElementById('f-pickup-loc').classList.remove('field-locked');
+  document.getElementById('f-pickup-detail').classList.remove('field-locked');
+
   window.isPromoGacoan = false;
   let fDistance = document.getElementById('f-distance');
   if (fDistance) { fDistance.readOnly = false; fDistance.style.backgroundColor = ''; }
@@ -1955,7 +2188,7 @@ window.doUpload = async () => {
   finally { hideLoading(); }
 };
 
-/* ========== 6. PEMANTAUAN ORDER ========== */
+/* ========== PEMANTAUAN ORDER ========== */
 function subscribeOrders() {
   if (unsubscribeOrders) unsubscribeOrders();
   if (!currentUserUid) return;
@@ -2050,6 +2283,14 @@ window.batalOrder = async id => {
   catch (e) { showToast('Gagal'); } finally { hideLoading(); }
 };
 
+/* ========== REFRESH PROSES (tanpa loading spinner) ========== */
+window.refreshProses = () => {
+  const btn = document.getElementById('refresh-proses-btn');
+  btn.classList.add('spin');
+  setTimeout(() => btn.classList.remove('spin'), 500);
+  window.renderProses();
+};
+
 window.renderProses = () => {
   const c = document.getElementById('proses-results');
   const all = window.activeOrdersData;
@@ -2093,14 +2334,18 @@ window.renderProses = () => {
         </div>`;
     }
 
+    // Payment badge
+    let paymentBadge = o.pembayaran ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--r-full);background:${o.pembayaran==='Transfer'?'var(--oneui-blue-bg)':'var(--oneui-green-bg)'};color:${o.pembayaran==='Transfer'?'var(--oneui-blue)':'var(--oneui-green)'};">${o.pembayaran==='Transfer'?'💳 Transfer':'💵 COD'}</span>` : '';
+
     h += `<div class="order-card" id="card-${o.id}">
       <div class="order-card-header" onclick="window.toggleDetail('${o.id}')">
         <div>
           <div class="order-card-num">${o.kategori}</div>
           <div class="order-card-type">${new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ${o.jenisOngkir || 'Normal'}</div>
         </div>
-        <div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
           <span class="status-pill ${statusClass}">${statusLabel}</span>
+          ${paymentBadge}
         </div>
       </div>
       <div class="order-card-body">
@@ -2124,7 +2369,7 @@ window.renderProses = () => {
           </div>
         </div>
         ${stat === 'menunggu' ? `
-          <button style="width:100%;padding:10px;border-radius:var(--r-full);border:1.5px solid var(--oneui-red);background:var(--oneui-red-bg);color:var(--oneui-red);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;" onclick="window.batalOrder('${o.id}')">
+          <button style="width:100%;padding:10px;border-radius:var(--r-full);border:1.5px solid var(--oneui-red);background:var(--oneui-red-bg);color:var(--oneui-red);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all 0.18s ease;" onclick="window.batalOrder('${o.id}')">
             Batalkan Pesanan
           </button>` : ''}
         <button class="toggle-detail-btn" onclick="window.toggleDetail('${o.id}')">
@@ -2142,6 +2387,7 @@ window.renderProses = () => {
           </div>` : ''}
         <div class="detail-grid">
           <div class="detail-row"><span class="detail-key">Argo</span><span class="detail-val" style="color:var(--oneui-blue);">Rp ${(o.Argo || 0).toLocaleString('id-ID')}</span></div>
+          <div class="detail-row"><span class="detail-key">Pembayaran</span><span class="detail-val">${o.pembayaran || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Penerima</span><span class="detail-val">${o.namaPenerima}</span></div>
           <div class="detail-row"><span class="detail-key">Ambil</span><span class="detail-val">${o.namaAmbil}</span></div>
           <div class="detail-row"><span class="detail-key">Antar</span><span class="detail-val">${o.NamaAntar}</span></div>
@@ -2253,7 +2499,7 @@ window.confirmArrival = async () => {
   document.getElementById('arrival-modal').classList.remove('open');
 };
 
-/* ========== 7. RIWAYAT (ARCHIVE) ========== */
+/* ========== RIWAYAT (ARCHIVE) ========== */
 window.renderArchive = () => {
   const sv = document.getElementById('search-input').value.toLowerCase(), rs = document.getElementById('archive-results');
   let f = window.historyOrdersData.filter(e => (e.namaPenerima || 'Tanpa Nama').toLowerCase().includes(sv));
@@ -2286,6 +2532,7 @@ window.renderArchive = () => {
         <div class="detail-grid">
           <div class="detail-row"><span class="detail-key">Waktu</span><span class="detail-val">${new Date(e.createdAt).toLocaleString('id-ID')}</span></div>
           <div class="detail-row"><span class="detail-key">Jenis Ongkir</span><span class="detail-val">${e.jenisOngkir || 'Normal'}</span></div>
+          <div class="detail-row"><span class="detail-key">Pembayaran</span><span class="detail-val">${e.pembayaran || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Driver</span><span class="detail-val">${e.driverName || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Ambil</span><span class="detail-val">${e.namaAmbil || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Antar</span><span class="detail-val">${e.NamaAntar || '-'}</span></div>
@@ -2309,7 +2556,7 @@ window.onSearch = () => {
 };
 window.clearSearch = () => { document.getElementById('search-input').value = ''; window.onSearch(); };
 
-/* ========== 8. NAVIGASI, WAKTU, ONGKIR, LOKASI ========== */
+/* ========== NAVIGASI ========== */
 window.closeInfoModalAndFetchLoc = () => {
   document.getElementById('info-modal').classList.remove('open');
   if (selectedType === 'Kirim Instan') window.getLocation('f-pickup-loc');
@@ -2429,19 +2676,41 @@ window.calculateArgoManual = () => {
     }
     if (window.jenisOngkir === 'Nebeng') { f = Math.round((f / 3) + 500); }
     window.currentOrderDist = d; window.currentOrderFare = Math.round(f);
-    document.getElementById('display-fare').textContent = 'Rp ' + window.currentOrderFare.toLocaleString('id-ID');
+    const fareEl = document.getElementById('display-fare');
+    fareEl.textContent = 'Rp ' + window.currentOrderFare.toLocaleString('id-ID');
+    const fareBox = document.getElementById('fare-display-box');
+    if (fareBox) {
+      fareBox.classList.remove('fare-updated');
+      void fareBox.offsetWidth; // reflow
+      fareBox.classList.add('fare-updated');
+    }
   } else {
     window.currentOrderDist = null; window.currentOrderFare = null;
     document.getElementById('display-fare').textContent = 'Rp 0';
   }
 };
 
+/* ========== SELECT TYPE — with Promo Gacoan lock logic ========== */
 window.selectType = (el, t) => {
   document.querySelectorAll('#type-chips .chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   selectedType = t;
 
-  window.isPromoGacoan = false;
+  // If switching away from gacoan promo — reset jenis ongkir to Normal automatically
+  if (window.isPromoGacoan) {
+    window.isPromoGacoan = false;
+    window.setOngkir('Normal');
+    // Unlock fields
+    const fPL = document.getElementById('f-pickup-loc');
+    const fPD = document.getElementById('f-pickup-detail');
+    fPL.readOnly = false;
+    fPL.classList.remove('field-locked');
+    fPD.readOnly = false;
+    fPD.classList.remove('field-locked');
+    document.getElementById('pickup-lock-badge').classList.add('d-none');
+    document.getElementById('pickup-detail-lock-badge').classList.add('d-none');
+  }
+
   let fDistance = document.getElementById('f-distance');
   if (fDistance) { fDistance.readOnly = false; fDistance.style.backgroundColor = ''; fDistance.value = ''; window.calculateArgoManual(); }
 
@@ -2497,7 +2766,7 @@ window.selectType = (el, t) => {
   }
 };
 
-/* ========== 9. FUNGSI EKSTRAKTOR KOORDINAT ========== */
+/* ========== KOORDINAT EXTRACTOR ========== */
 function exC(str) {
   if (!str) return null;
   let m = str.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
@@ -2508,7 +2777,7 @@ function exC(str) {
   return [lng, lat];
 }
 
-/* ========== 10. TOAST & BANNER SLIDER ========== */
+/* ========== TOAST ========== */
 let _tt;
 function showToast(m) {
   let t = document.getElementById('toast');
@@ -2518,6 +2787,7 @@ function showToast(m) {
   _tt = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
+/* ========== BANNER SLIDER ========== */
 let currentSlide = 0;
 const totalSlides = 5;
 setInterval(() => {
@@ -2531,11 +2801,28 @@ setInterval(() => {
 window.openPromoModal = () => { document.getElementById('promo-modal').classList.add('open'); };
 window.closePromoModal = () => { document.getElementById('promo-modal').classList.remove('open'); };
 
+/* ========== APPLY PROMO GACOAN — lock fields, lock ongkir ========== */
 window.applyPromo = () => {
   const jastipChip = document.querySelector('.chip[onclick*="Jastip resto/toko"]');
   if (jastipChip && selectedType !== 'Jastip resto/toko') { window.selectType(jastipChip, 'Jastip resto/toko'); }
-  document.getElementById('f-pickup-loc').value = '-7.047365,110.420778';
-  document.getElementById('f-pickup-detail').value = 'Mie Gacoan Setiabudi';
+
+  // Set and LOCK pickup location
+  const fPL = document.getElementById('f-pickup-loc');
+  const fPD = document.getElementById('f-pickup-detail');
+
+  fPL.value = '-7.047365,110.420778';
+  fPD.value = 'Mie Gacoan Setiabudi';
+
+  // Lock fields — cannot be edited manually
+  fPL.readOnly = true;
+  fPL.classList.add('field-locked');
+  fPD.readOnly = true;
+  fPD.classList.add('field-locked');
+
+  // Show lock badges
+  document.getElementById('pickup-lock-badge').classList.remove('d-none');
+  document.getElementById('pickup-detail-lock-badge').classList.remove('d-none');
+
   window.isPromoGacoan = true;
   let fDistance = document.getElementById('f-distance');
   if (fDistance) { fDistance.readOnly = true; fDistance.style.backgroundColor = 'var(--surface-input)'; }
