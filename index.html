@@ -996,8 +996,8 @@ textarea.field { resize: none; line-height: 1.5; }
   background: var(--oneui-blue);
   border-color: var(--oneui-blue);
   box-shadow: 0 0 0 4px rgba(18,89,195,0.15) !important;
-  animation: pulseDot 1.8s infinite;
   transform: scale(1.1);
+  animation: colorPulse 2s infinite ease-in-out;
 }
 .tl-step.active .tl-dot .material-symbols-outlined { color: #FFF; }
 .tl-step.done .tl-dot {
@@ -1005,10 +1005,18 @@ textarea.field { resize: none; line-height: 1.5; }
   border-color: var(--oneui-blue);
 }
 .tl-step.done .tl-dot .material-symbols-outlined { color: var(--oneui-blue); }
-@keyframes pulseDot {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(18,89,195,0.15) !important; }
-  50% { box-shadow: 0 0 0 8px rgba(18,89,195,0.08) !important; }
+
+@keyframes colorPulse {
+  0%, 100% { 
+    background-color: rgba(18, 89, 195, 1); /* Warna biru menyala */
+    box-shadow: 0 0 8px rgba(18, 89, 195, 0.8); /* Sedikit efek cahaya */
+  }
+  50% { 
+    background-color: rgba(18, 89, 195, 0.1); /* Warna biru sangat pudar */
+    box-shadow: 0 0 0 rgba(18, 89, 195, 0); /* Cahaya hilang */
+  }
 }
+
 .tl-label {
   font-size: 10px;
   font-weight: 600;
@@ -1763,8 +1771,6 @@ select.field { appearance: none; -webkit-appearance: none; background-image: url
             </div>
           </div>
         </div>
-        
-        
         
         <div class="field-wrap">
           <label class="field-label">Jenis Ongkir <span class="field-required">*</span></label>
