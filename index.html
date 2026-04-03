@@ -1906,6 +1906,8 @@ window.currentDriverMarkers = {};
 window.isPromoGacoan = false;
 window.prevOrderStats = {};
 window.etaIntervals = {};
+window.orderEtaTarget = {}; // TAMBAHAN: Menyimpan target waktu ETA
+
 
 /* ========== UI & UX HANDLERS ========== */
 if (window.visualViewport) {
@@ -2224,12 +2226,14 @@ function subscribeOrders() {
       else { loopAudio.pause(); }
     }
 
-    window.activeOrdersData.forEach(o => {
-      if (o.status === 'tiba' && window.currentArrivalOrderId !== o.id && !diprosesSet.has(o.id + '_tiba')) {
+        window.activeOrdersData.forEach(o => {
+      // FIX 1 & 2: Pastikan hanya dipanggil sekali dan kirim parameter pembayaran
+      if (o.status === 'tiba' && !diprosesSet.has(o.id + '_tiba')) {
         diprosesSet.add(o.id + '_tiba');
-        window.showArrivalPopup(o.id, o.Argo);
+        window.showArrivalPopup(o.id, o.Argo, o.pembayaran);
       }
     });
+
 
     if (document.getElementById('page-proses').classList.contains('active')) window.renderProses();
     if (document.getElementById('page-archive').classList.contains('active')) window.renderArchive();
@@ -2246,25 +2250,49 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
       const geojson = data.routes[0].geometry;
       const durationSec = data.routes[0].duration;
 
-      let tambahanWaktu = 0;
-      if (orderData.kategori === 'Jastip resto/toko') tambahanWaktu = 15 * 60;
-      else if (orderData.kategori === 'Ambil Instan') tambahanWaktu = 5 * 60;
+      // FIX 3: Gunakan Timestamp target waktu agar tidak mereset saat render ulang
+      let now = Date.now();
+      
+      if (!window.orderEtaTarget[orderData.id]) {
+        let totalDetikAwal;
+        
+        // FIX 4: Estimasi khusus ongkir Nebeng (60 Menit)
+        if (orderData.jenisOngkir === 'Nebeng') {
+          totalDetikAwal = 60 * 60; // 60 menit
+        } else {
+          let tambahanWaktu = 0;
+          if (orderData.kategori === 'Jastip resto/toko') tambahanWaktu = 15 * 60;
+          else if (orderData.kategori === 'Ambil Instan') tambahanWaktu = 5 * 60;
+          totalDetikAwal = Math.round(durationSec + tambahanWaktu);
+        }
+        
+        // Simpan ke target absolut di memori
+        window.orderEtaTarget[orderData.id] = now + (totalDetikAwal * 1000);
+      }
 
-      let totalDetik = Math.round(durationSec + tambahanWaktu);
       let etaEl = document.getElementById('eta-' + orderData.id);
 
       if (etaEl) {
         if (window.etaIntervals[orderData.id]) clearInterval(window.etaIntervals[orderData.id]);
+        
         window.etaIntervals[orderData.id] = setInterval(() => {
-          if (totalDetik <= 0) {
+          let currentNow = Date.now();
+          // Hitung sisa waktu dari target
+          let sisaDetik = Math.max(0, Math.round((window.orderEtaTarget[orderData.id] - currentNow) / 1000));
+
+          if (sisaDetik <= 0) {
             clearInterval(window.etaIntervals[orderData.id]);
             etaEl.innerText = `Driver Segera Tiba!`;
             return;
           }
-          let m = Math.floor(totalDetik / 60);
-          let s = totalDetik % 60;
-          etaEl.innerText = `Estimasi: ${m}m ${s}d`;
-          totalDetik--;
+          
+          let m = Math.floor(sisaDetik / 60);
+          let s = sisaDetik % 60;
+          
+          // Tambahan keterangan untuk orderan Nebeng
+          let noteNebeng = orderData.jenisOngkir === 'Nebeng' ? " (EST bisa lebih karena gabungan)" : "";
+          
+          etaEl.innerText = `Estimasi: ${m}m ${s}d${noteNebeng}`;
         }, 1000);
       }
 
@@ -2488,15 +2516,49 @@ window.showDriverInfo = id => {
 };
 window.closeDriverModal = () => document.getElementById('driver-modal').classList.remove('open');
 
-window.showArrivalPopup = (orderId, fare) => {
-  window.currentArrivalOrderId = orderId;
-  document.getElementById('arrival-fare-text').innerHTML = `Rp ${(fare || 0).toLocaleString('id-ID')}`;
+window.showArrivalPopup = (orderId, fare, pembayaran) => {
   const modal = document.getElementById('arrival-modal');
+  // Cegah popup ganda jika popup sebelumnya masih terbuka
+  if (modal.classList.contains('open')) return;
+
+  window.currentArrivalOrderId = orderId;
+
+  // FIX 2: Cek metode pembayaran. Jika Transfer, jangan tampilkan nominal.
+  if (pembayaran === 'Transfer') {
+    document.getElementById('arrival-fare-text').innerHTML = `Sudah Dibayar (Transfer)`;
+  } else {
+    document.getElementById('arrival-fare-text').innerHTML = `Rp ${(fare || 0).toLocaleString('id-ID')}`;
+  }
+  
   modal.classList.add('open');
+  
   const ringtone = document.getElementById('sfx-ringtone');
-  ringtone.loop = true; ringtone.play().catch(() => {});
-  window.arrivalRingInterval = setInterval(() => { if (ringtone.paused) ringtone.play().catch(() => {}); }, 3000);
+  if (ringtone) {
+    ringtone.loop = true; 
+    ringtone.play().catch(() => {});
+    // Pastikan interval sebelumnya dibersihkan
+    if (window.arrivalRingInterval) clearInterval(window.arrivalRingInterval);
+    window.arrivalRingInterval = setInterval(() => { 
+      if (ringtone.paused) ringtone.play().catch(() => {}); 
+    }, 3000);
+  }
 };
+
+window.confirmArrival = async () => {
+  if (window.arrivalRingInterval) { 
+    clearInterval(window.arrivalRingInterval); 
+    window.arrivalRingInterval = null; 
+  }
+  const ringtone = document.getElementById('sfx-ringtone');
+  if (ringtone) {
+    ringtone.loop = false; 
+    ringtone.pause(); 
+    ringtone.currentTime = 0;
+  }
+  document.getElementById('arrival-modal').classList.remove('open');
+  window.currentArrivalOrderId = null;
+};
+
 
 window.confirmArrival = async () => {
   if (window.arrivalRingInterval) { clearInterval(window.arrivalRingInterval); window.arrivalRingInterval = null; }
