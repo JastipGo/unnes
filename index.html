@@ -2766,25 +2766,36 @@ window.calculateArgoManual = () => {
   let d = parseFloat(document.getElementById('f-distance').value);
   if (!isNaN(d) && d > 0) {
     let f = 0;
+    
     if (selectedType === 'Jastip resto/toko') {
-      if (d <= 1) f = 5000;
-      else if (d <= 2) f = 7000;
-      else if (d <= 3) f = 7000 + (Math.ceil((d - 2) * 20) * 100);
-      else if (d <= 4) f = 9000 + (Math.ceil((d - 3) * 20) * 100);
-      else if (d <= 5) f = 11000 + (Math.ceil((d - 4) * 20) * 200);
-      else f = 11000 + (Math.ceil((d - 5) * 20) * 130);
+      // Argo Jastip
+      if (d <= 1) {
+        f = 3500;
+      } else {
+        // Jarak sisa dalam meter, dibagi 50 meter, dikali Rp 95
+        f = 3500 + (Math.ceil(((d - 1) * 1000) / 50) * 95);
+      }
     } else {
-      if (d <= 1) f = 4000;
-      else if (d <= 2) f = 4000 + (Math.ceil((d - 1) * 20) * 85);
-      else if (d <= 3) f = 5500 + (Math.ceil((d - 2) * 20) * 50);
-      else if (d <= 4) f = 6500 + (Math.ceil((d - 3) * 20) * 150);
-      else if (d <= 5) f = 9500 + (Math.ceil((d - 4) * 20) * 100);
-      else f = 11000 + (Math.ceil((d - 5) * 20) * 125);
+      // Argo Ambil Instan / Kirim Instan
+      if (d <= 1) {
+        f = 3000;
+      } else {
+        // Jarak sisa dalam meter, dibagi 50 meter, dikali Rp 85
+        f = 3000 + (Math.ceil(((d - 1) * 1000) / 50) * 85);
+      }
     }
-    if (window.jenisOngkir === 'Nebeng') { f = Math.round((f / 3) + 500); }
-    window.currentOrderDist = d; window.currentOrderFare = Math.round(f);
+
+    // Argo Nebeng (38% dari argo normal yang didapat)
+    if (window.jenisOngkir === 'Nebeng') { 
+      f = Math.round(f * 0.38); 
+    }
+
+    window.currentOrderDist = d; 
+    window.currentOrderFare = Math.round(f);
+    
     const fareEl = document.getElementById('display-fare');
     fareEl.textContent = 'Rp ' + window.currentOrderFare.toLocaleString('id-ID');
+    
     const fareBox = document.getElementById('fare-display-box');
     if (fareBox) {
       fareBox.classList.remove('fare-updated');
@@ -2792,7 +2803,8 @@ window.calculateArgoManual = () => {
       fareBox.classList.add('fare-updated');
     }
   } else {
-    window.currentOrderDist = null; window.currentOrderFare = null;
+    window.currentOrderDist = null; 
+    window.currentOrderFare = null;
     document.getElementById('display-fare').textContent = 'Rp 0';
   }
 };
