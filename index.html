@@ -1008,13 +1008,119 @@ textarea.field { resize: none; line-height: 1.5; }
 
 @keyframes colorPulse {
   0%, 100% { 
-    background-color: rgba(18, 89, 195, 1); /* Warna biru menyala */
-    box-shadow: 0 0 8px rgba(18, 89, 195, 0.8); /* Sedikit efek cahaya */
+    background-color: rgba(18, 89, 195, 1);
+    box-shadow: 0 0 8px rgba(18, 89, 195, 0.8);
   }
   50% { 
-    background-color: rgba(18, 89, 195, 0.1); /* Warna biru sangat pudar */
-    box-shadow: 0 0 0 rgba(18, 89, 195, 0); /* Cahaya hilang */
+    background-color: rgba(18, 89, 195, 0.1);
+    box-shadow: 0 0 0 rgba(18, 89, 195, 0);
   }
+}
+
+/* Pulse KUNING untuk status menungguAntar — lebih cepat & agresif */
+@keyframes yellowPulse {
+  0%, 100% {
+    background-color: #E07B00;
+    box-shadow: 0 0 0 6px rgba(224, 123, 0, 0.35), 0 0 16px rgba(224, 123, 0, 0.6);
+    transform: scale(1.12);
+  }
+  50% {
+    background-color: #FFC043;
+    box-shadow: 0 0 0 12px rgba(224, 123, 0, 0.08), 0 0 4px rgba(224, 123, 0, 0.2);
+    transform: scale(1.05);
+  }
+}
+.tl-step.active-yellow .tl-dot {
+  background: #E07B00 !important;
+  border-color: #E07B00 !important;
+  animation: yellowPulse 0.9s infinite ease-in-out !important;
+}
+.tl-step.active-yellow .tl-dot .material-symbols-outlined { color: #FFF !important; }
+.tl-step.active-yellow .tl-label { color: #E07B00 !important; font-weight: 700; }
+
+/* Banner info menungguAntar */
+.antrian-banner {
+  background: linear-gradient(135deg, #FEF3E2 0%, #FFF8EE 100%);
+  border: 1.5px solid rgba(224,123,0,0.25);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #7A4500;
+  line-height: 1.5;
+}
+.antrian-banner .material-symbols-outlined { color: #E07B00; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* Mini driver cards untuk tombol WA */
+.driver-mini-list {
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+.driver-mini-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.driver-mini-label .material-symbols-outlined { font-size: 14px; color: #25D366; }
+.driver-mini-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.driver-mini-scroll::-webkit-scrollbar { display: none; }
+.driver-mini-card {
+  flex-shrink: 0;
+  width: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  animation: cardIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+}
+.driver-mini-card:nth-child(1) { animation-delay: 0ms; }
+.driver-mini-card:nth-child(2) { animation-delay: 60ms; }
+.driver-mini-card:nth-child(3) { animation-delay: 120ms; }
+.driver-mini-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2.5px solid #25D366;
+  box-shadow: 0 2px 8px rgba(37,211,102,0.25);
+  background: var(--surface-input);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+}
+.driver-mini-card:active .driver-mini-avatar { transform: scale(0.9); }
+.driver-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.driver-mini-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 68px;
+}
+.driver-mini-wa-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #25D366;
+  background: rgba(37,211,102,0.1);
+  border-radius: var(--r-full);
+  padding: 2px 6px;
 }
 
 .tl-label {
@@ -1873,7 +1979,7 @@ select.field { appearance: none; -webkit-appearance: none; background-image: url
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, doc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyDv-jfV1lFxEbvQn9TcgLMz6dyeyaK0OMc",
@@ -1907,6 +2013,8 @@ window.isPromoGacoan = false;
 window.prevOrderStats = {};
 window.etaIntervals = {};
 window.orderEtaTarget = {}; // TAMBAHAN: Menyimpan target waktu ETA
+window.cachedDriverList = []; // Cache daftar driver untuk tombol WA
+window.driverListFetched = false; // Flag agar fetch hanya sekali per sesi
 
 
 /* ========== UI & UX HANDLERS ========== */
@@ -2258,7 +2366,7 @@ function subscribeOrders() {
     window.activeOrdersData = a.filter(o => o.status !== 'selesai' && o.status !== 'dibatalkan');
     window.historyOrdersData = a.filter(o => o.status === 'selesai' || o.status === 'dibatalkan');
 
-    let hasActiveProgress = window.activeOrdersData.some(o => ['menunggu', 'terima', 'ambil', 'ngantar'].includes(o.status));
+    let hasActiveProgress = window.activeOrdersData.some(o => ['menunggu', 'menungguAntar', 'terima', 'ambil', 'ngantar'].includes(o.status));
     let loopAudio = document.getElementById('sfx-progress-loop');
     if (loopAudio) {
       if (hasActiveProgress) { if (loopAudio.paused) loopAudio.play().catch(() => {}); }
@@ -2287,53 +2395,6 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
     const data = await res.json();
     if (data.routes && data.routes[0]) {
       const geojson = data.routes[0].geometry;
-      const durationSec = data.routes[0].duration;
-
-      // FIX 3: Gunakan Timestamp target waktu agar tidak mereset saat render ulang
-      let now = Date.now();
-      
-      if (!window.orderEtaTarget[orderData.id]) {
-        let totalDetikAwal;
-        
-        // FIX 4: Estimasi khusus ongkir Nebeng (60 Menit)
-        if (orderData.jenisOngkir === 'Nebeng') {
-          totalDetikAwal = 60 * 60; // 60 menit
-        } else {
-          let tambahanWaktu = 0;
-          if (orderData.kategori === 'Jastip resto/toko') tambahanWaktu = 15 * 60;
-          else if (orderData.kategori === 'Ambil Instan') tambahanWaktu = 5 * 60;
-          totalDetikAwal = Math.round(durationSec + tambahanWaktu);
-        }
-        
-        // Simpan ke target absolut di memori
-        window.orderEtaTarget[orderData.id] = now + (totalDetikAwal * 1000);
-      }
-
-      let etaEl = document.getElementById('eta-' + orderData.id);
-
-      if (etaEl) {
-        if (window.etaIntervals[orderData.id]) clearInterval(window.etaIntervals[orderData.id]);
-        
-        window.etaIntervals[orderData.id] = setInterval(() => {
-          let currentNow = Date.now();
-          // Hitung sisa waktu dari target
-          let sisaDetik = Math.max(0, Math.round((window.orderEtaTarget[orderData.id] - currentNow) / 1000));
-
-          if (sisaDetik <= 0) {
-            clearInterval(window.etaIntervals[orderData.id]);
-            etaEl.innerText = `Driver Segera Tiba!`;
-            return;
-          }
-          
-          let m = Math.floor(sisaDetik / 60);
-          let s = sisaDetik % 60;
-          
-          // Tambahan keterangan untuk orderan Nebeng
-          let noteNebeng = orderData.jenisOngkir === 'Nebeng' ? " (EST bisa lebih karena gabungan)" : "";
-          
-          etaEl.innerText = `Estimasi: ${m}m ${s}d${noteNebeng}`;
-        }, 1000);
-      }
 
       if (map.getSource(routeId)) {
         map.getSource(routeId).setData(geojson);
@@ -2347,6 +2408,99 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
       }
     }
   } catch (e) { console.error("Gagal load rute OSRM:", e); }
+}
+
+/* ========== JADWALKAN DRIVER MINI CARDS ========== */
+window._scheduleDriverMiniCards = (o) => {
+  const isNebeng = o.jenisOngkir === 'Nebeng';
+  // Normal: tampil setelah 10 menit. Nebeng: setelah 15 menit.
+  const delayMs = isNebeng ? 15 * 60 * 1000 : 10 * 60 * 1000;
+  const createdAt = o.createdAt ? new Date(o.createdAt).getTime() : Date.now();
+  const elapsed = Date.now() - createdAt;
+  const remaining = Math.max(0, delayMs - elapsed);
+
+  // Render langsung jika sudah melewati waktu
+  setTimeout(async () => {
+    const wrap = document.getElementById('driver-mini-wrap-' + o.id);
+    if (!wrap) return; // Card sudah tidak ada (status berubah)
+    // Cek ulang status dari data terbaru
+    const currentOrder = window.activeOrdersData.find(x => x.id === o.id);
+    if (!currentOrder || (currentOrder.status !== 'menunggu' && currentOrder.status !== 'menungguAntar')) return;
+
+    const drivers = await fetchDriverList();
+    if (!drivers.length) return;
+
+    const argoStr = o.Argo ? `Rp ${o.Argo.toLocaleString('id-ID')}` : 'sesuai argo';
+    const msgTemplate = encodeURIComponent(
+      `Halo kak, saya mau tanya apakah bisa ambil orderan saya?\n\nKategori: ${o.kategori}\nAmbil: ${o.namaAmbil}\nAntar: ${o.NamaAntar}\nArgo: ${argoStr}\n\nMohon konfirmasi ya kak 🙏`
+    );
+
+    let driverHtml = drivers.slice(0, 6).map(d => {
+      const waNum = '62' + d.wa.replace(/^0/, '');
+      const imgHtml = d.urlProfile
+        ? `<img src="${d.urlProfile}" alt="${d.nama}" onerror="this.parentNode.innerHTML='<span class=\\"material-symbols-outlined\\" style=\\"font-size:22px;color:var(--text-tertiary)\\">person</span>'">`
+        : `<span class="material-symbols-outlined" style="font-size:22px;color:var(--text-tertiary);">person</span>`;
+      return `<a class="driver-mini-card" href="https://wa.me/${waNum}?text=${msgTemplate}" target="_blank">
+        <div class="driver-mini-avatar">${imgHtml}</div>
+        <div class="driver-mini-name">${d.nama.split(' ')[0]}</div>
+        <div class="driver-mini-wa-badge">WA</div>
+      </a>`;
+    }).join('');
+
+    wrap.innerHTML = `<div class="driver-mini-list">
+      <div class="driver-mini-label">
+        <span class="material-symbols-outlined">phone_in_talk</span>
+        Hubungi driver langsung via WA:
+      </div>
+      <div class="driver-mini-scroll">${driverHtml}</div>
+    </div>`;
+  }, remaining);
+};
+
+/* ========== FETCH DAFTAR DRIVER UNTUK TOMBOL WA ========== */
+async function fetchDriverList() {
+  if (window.driverListFetched) return window.cachedDriverList;
+  try {
+    const snap = await getDocs(query(collection(db, "driver"), limit(12)));
+    window.cachedDriverList = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.wa || data.noWa) {
+        window.cachedDriverList.push({
+          id: d.id,
+          nama: data.nama || data.name || 'Driver',
+          wa: (data.wa || data.noWa || '').replace(/^0/, ''),
+          urlProfile: data.urlProfile || data.foto || '',
+          kendaraan: data.kendaraan || '',
+          argo: data.argo || ''
+        });
+      }
+    });
+    window.driverListFetched = true;
+  } catch(e) { console.warn('Gagal fetch driver list', e); }
+  return window.cachedDriverList;
+}
+
+/* ========== SMART ETA DARI JARAK DRIVER (ambil sekali) ========== */
+async function computeSmartEtaFromDriver(orderId, driverCoords, destCoords, jenisOngkir, kategori) {
+  // Jika sudah pernah dihitung untuk order ini, skip
+  if (window.orderEtaTarget[orderId]) return;
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${driverCoords[0]},${driverCoords[1]};${destCoords[0]},${destCoords[1]}?overview=false`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.routes && data.routes[0]) {
+      let durationSec = data.routes[0].duration;
+      let tambahan = 0;
+      if (jenisOngkir === 'Nebeng') {
+        durationSec = 60 * 60; // estimasi tetap 60 menit untuk nebeng
+      } else {
+        if (kategori === 'Jastip resto/toko') tambahan = 15 * 60;
+        else if (kategori === 'Ambil Instan') tambahan = 5 * 60;
+      }
+      window.orderEtaTarget[orderId] = Date.now() + ((durationSec + tambahan) * 1000);
+    }
+  } catch(e) { console.warn('Gagal hitung smart ETA driver', e); }
 }
 
 window.batalOrder = async id => {
@@ -2383,16 +2537,20 @@ window.renderProses = () => {
     let step1 = '', step2 = '', step3 = '', step4 = '';
     let fillWidth = '0%';
 
+    // Status menungguAntar: antrian gabungan (nebeng), step ngantar aktif kuning
+    const isMenungguAntar = (stat === 'menungguAntar');
+
     if (stat === 'menunggu') { step1 = 'active'; fillWidth = '15%'; }
     else if (stat === 'terima' || stat === 'ambil') { step1 = 'done'; step2 = 'active'; fillWidth = '38%'; }
     else if (stat === 'ngantar') { step1 = 'done'; step2 = 'done'; step3 = 'active'; fillWidth = '65%'; }
+    else if (stat === 'menungguAntar') { step1 = 'done'; step2 = 'done'; step3 = 'active-yellow'; fillWidth = '65%'; }
     else if (stat === 'tiba') { step1 = 'done'; step2 = 'done'; step3 = 'done'; step4 = 'active'; fillWidth = '100%'; }
 
-    let statusClass = stat === 'menunggu' ? 'status-menunggu' : stat === 'tiba' ? 'status-done' : 'status-active';
-    let statusLabel = stat === 'menunggu' ? 'Menunggu Driver' : stat.toUpperCase();
+    let statusClass = (stat === 'menunggu' || stat === 'menungguAntar') ? 'status-menunggu' : stat === 'tiba' ? 'status-done' : 'status-active';
+    let statusLabel = stat === 'menunggu' ? 'Menunggu Driver' : stat === 'menungguAntar' ? ' Antrian Antar' : stat.toUpperCase();
 
     let driverCardHtml = '';
-    if (stat !== 'menunggu' && o.getdriverId) {
+    if (stat !== 'menunggu' && stat !== 'menungguAntar' && o.getdriverId) {
       driverCardHtml = `
         <div class="driver-card" onclick="window.showDriverInfo('${o.id}')">
           <img src="${o.UrlprofileDriver || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" alt="Driver">
@@ -2407,8 +2565,20 @@ window.renderProses = () => {
         </div>`;
     }
 
+    // Banner info menungguAntar
+    let antrianBannerHtml = '';
+    if (isMenungguAntar) {
+      antrianBannerHtml = `<div class="antrian-banner">
+        <span class="material-symbols-outlined">groups</span>
+        <div><strong>Driver sedang mengantar!</strong><br>Orderan Anda masuk di antrian gabungan berikutnya. Harap tunggu giliran antar.</div>
+      </div>`;
+    }
+
     // Payment badge
-    let paymentBadge = o.pembayaran ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--r-full);background:${o.pembayaran==='Transfer'?'var(--oneui-blue-bg)':'var(--oneui-green-bg)'};color:${o.pembayaran==='Transfer'?'var(--oneui-blue)':'var(--oneui-green)'};">${o.pembayaran==='Transfer'?'💳 Transfer':'💵 COD'}</span>` : '';
+    let paymentBadge = o.pembayaran ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--r-full);background:${o.pembayaran==='Transfer'?'var(--oneui-blue-bg)':'var(--oneui-green-bg)'};color:${o.pembayaran==='Transfer'?'var(--oneui-blue)':'var(--oneui-green)'};">${o.pembayaran==='Transfer'?' Transfer':' COD'}</span>` : '';
+
+    // Placeholder untuk driver mini list (diisi async setelah render)
+    let driverMiniPlaceholder = (stat === 'menunggu' || stat === 'menungguAntar') ? `<div id="driver-mini-wrap-${o.id}"></div>` : '';
 
     h += `<div class="order-card" id="card-${o.id}">
       <div class="order-card-header" onclick="window.toggleDetail('${o.id}')">
@@ -2422,6 +2592,7 @@ window.renderProses = () => {
         </div>
       </div>
       <div class="order-card-body">
+        ${antrianBannerHtml}
         <div class="timeline-oneui">
           <div class="tl-track"><div class="tl-fill" style="width:${fillWidth};"></div></div>
           <div class="tl-step ${step1}">
@@ -2441,7 +2612,8 @@ window.renderProses = () => {
             <div class="tl-label">Tiba</div>
           </div>
         </div>
-        ${stat === 'menunggu' ? `
+        ${driverMiniPlaceholder}
+        ${stat === 'menunggu' || stat === 'menungguAntar' ? `
           <button style="width:100%;padding:10px;border-radius:var(--r-full);border:1.5px solid var(--oneui-red);background:var(--oneui-red-bg);color:var(--oneui-red);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all 0.18s ease;" onclick="window.batalOrder('${o.id}')">
             Batalkan Pesanan
           </button>` : ''}
@@ -2451,7 +2623,7 @@ window.renderProses = () => {
       </div>
       <div id="detail-${o.id}" class="order-detail-panel d-none">
         ${driverCardHtml}
-        ${(stat === 'ngantar' || stat === 'tiba') ? `
+        ${(stat === 'ngantar' || stat === 'menungguAntar' || stat === 'tiba') ? `
           <div id="map-container-${o.id}" style="height:240px;width:100%;border-radius:var(--r-lg);margin-bottom:12px;border:1px solid var(--border-light);position:relative;overflow:hidden;">
             <div id="eta-${o.id}" class="eta-pill">Estimasi: Menghitung...</div>
             <button onclick="if(window.mapCenters['${o.id}']) window.mapCenters['${o.id}']()" class="map-center-btn">
@@ -2476,9 +2648,16 @@ window.renderProses = () => {
 
   c.innerHTML = h;
 
+  // Jadwalkan driver mini cards setelah timeout
+  all.forEach(o => {
+    if (o.status === 'menunggu' || o.status === 'menungguAntar') {
+      window._scheduleDriverMiniCards(o);
+    }
+  });
+
   setTimeout(() => {
     all.forEach(o => {
-      if (o.status === 'ngantar' || o.status === 'tiba') {
+      if (o.status === 'ngantar' || o.status === 'menungguAntar' || o.status === 'tiba') {
         let mEl = document.getElementById('map-container-' + o.id);
         if (mEl && !mEl.dataset.initialized) {
           mEl.dataset.initialized = "true";
@@ -2517,9 +2696,37 @@ window.renderProses = () => {
 
           window.mapCenters[o.id] = () => map.flyTo({ center: driverMarker.getLngLat(), zoom: 16 });
 
-          map.on('load', () => {
+          map.on('load', async () => {
+            // Smart ETA: ambil koordinat driver sekali, hitung ETA dari sana
+            let driverCoords = exC(o.sharelocationDriver);
+            if (driverCoords && !window.orderEtaTarget[o.id]) {
+              await computeSmartEtaFromDriver(o.id, driverCoords, destCoords, o.jenisOngkir, o.kategori);
+            }
+
+            // Gambar rute OSRM
             let startPoint = exC(o.titikAmbil) || exC(o.mapsAmbil);
             if (startPoint) { drawRouteOSRM(map, startPoint, destCoords, 'route-' + o.id, o); }
+
+            // Jalankan countdown ETA
+            let etaEl = document.getElementById('eta-' + o.id);
+            if (etaEl) {
+              if (window.etaIntervals[o.id]) clearInterval(window.etaIntervals[o.id]);
+              window.etaIntervals[o.id] = setInterval(() => {
+                if (!window.orderEtaTarget[o.id]) {
+                  etaEl.innerText = 'Estimasi: Menghitung...';
+                  return;
+                }
+                let sisaDetik = Math.max(0, Math.round((window.orderEtaTarget[o.id] - Date.now()) / 1000));
+                if (sisaDetik <= 0) {
+                  clearInterval(window.etaIntervals[o.id]);
+                  etaEl.innerText = 'Driver Segera Tiba!';
+                  return;
+                }
+                let m = Math.floor(sisaDetik / 60), s = sisaDetik % 60;
+                let noteNebeng = o.jenisOngkir === 'Nebeng' ? ' (EST gabungan)' : '';
+                etaEl.innerText = `Estimasi: ${m}m ${s}d${noteNebeng}`;
+              }, 1000);
+            }
           });
         }
 
