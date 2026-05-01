@@ -2144,6 +2144,21 @@ select.field { appearance: none; -webkit-appearance: none; background-image: url
   </div>
 </div>
 
+<!-- Order Lock Modal -->
+<div class="modal-overlay" id="order-lock-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Satu Order Dulu</div>
+    <div class="modal-sub">Anda hanya bisa membuat 1 order aktif dalam satu waktu. Tombol Buat Pesanan akan aktif lagi setelah order sebelumnya selesai.</div>
+    <div class="info-row" style="margin-bottom:16px;">
+      <span class="material-symbols-outlined">lock</span>
+      <div class="info-row-text">Selama order masih berjalan, tombol pengiriman akan dinonaktifkan untuk mencegah order bersamaan.</div>
+    </div>
+    <button class="btn-primary" onclick="window.closeOrderLockModal()">Mengerti</button>
+    <div style="padding-bottom:8px;"></div>
+  </div>
+</div>
+
 <!-- Complete Profile Modal -->
 <div class="modal-overlay" id="complete-profile-modal">
   <div class="modal-sheet">
@@ -2650,6 +2665,34 @@ window.isPromoGacoan = false;
 window.isCreatingOrder = false;
 window.archiveFilterDate = '';
 window.prevOrderStats = {};
+window.orderLockNoticeShown = false;
+window.showOrderLockModal = () => document.getElementById('order-lock-modal')?.classList.add('open');
+window.closeOrderLockModal = () => document.getElementById('order-lock-modal')?.classList.remove('open');
+window.updateUploadLockState = () => {
+  const btn = document.getElementById('btn-upload');
+  const locked = (window.activeOrdersData || []).some(o => !['selesai', 'dibatalkan'].includes(o.status));
+  const creating = !!window.isCreatingOrder;
+  const shouldDisable = locked || creating;
+
+  if (btn) {
+    btn.disabled = shouldDisable;
+    btn.style.opacity = shouldDisable ? '0.62' : '';
+    btn.style.pointerEvents = shouldDisable ? 'none' : '';
+    btn.innerHTML = shouldDisable
+      ? '<span class="material-symbols-outlined">lock</span> Tunggu Order Selesai'
+      : '<span class="material-symbols-outlined">bolt</span> Buat Pesanan';
+  }
+
+  if (locked) {
+    if (!window.orderLockNoticeShown && document.getElementById('page-upload').classList.contains('active')) {
+      window.orderLockNoticeShown = true;
+      window.showOrderLockModal();
+    }
+  } else {
+    window.orderLockNoticeShown = false;
+    window.closeOrderLockModal();
+  }
+};
 window.etaIntervals = {};
 window.orderEtaTarget = {}; // TAMBAHAN: Menyimpan target waktu ETA
 window.orderEtaStartedAt = {};
@@ -3067,7 +3110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  initDriverFabDrag();
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -3294,6 +3336,12 @@ window.selectPayment = (el, method) => {
 
 /* ========== MEMBUAT PESANAN ========== */
 window.doUpload = async () => {
+  const hasActiveOrder = (window.activeOrdersData || []).some(o => !['selesai', 'dibatalkan'].includes(o.status));
+  if (window.isCreatingOrder || hasActiveOrder) {
+    window.showOrderLockModal();
+    return showToast('Hanya bisa membuat 1 order aktif. Selesaikan order sebelumnya dulu.');
+  }
+
   let gi = document.getElementById(selectedType === 'Kirim Instan' ? 'f-pickup-loc' : 'f-delivery-loc');
   if (gi.dataset.valid === "false") return showToast('GPS lemah');
 
@@ -3405,15 +3453,6 @@ window.doUpload = async () => {
 
   gi.dataset.valid = "true"; window.setWaktu('Langsung'); window.setOngkir('Normal'); window.switchPage('proses');
 
-  const activeOrderExists = (window.activeOrdersData || []).some(o => !['selesai', 'dibatalkan'].includes(o.status));
-  if (window.isCreatingOrder) {
-    showToast('Pesanan sedang diproses, tunggu sebentar.');
-    return;
-  }
-  if (activeOrderExists) {
-    showToast('Hanya bisa menjalankan satu pesanan aktif. Selesaikan pesanan sebelumnya dulu.');
-    return;
-  }
 
   window.isCreatingOrder = true;
   showLoading('Membuat pesanan...');
@@ -3493,6 +3532,7 @@ function subscribeOrders() {
     });
 
 
+    window.updateUploadLockState();
     if (document.getElementById('page-proses').classList.contains('active')) window.renderProses();
     if (document.getElementById('page-archive').classList.contains('active')) window.renderArchive();
     Promise.resolve(window.refreshLiveOrderViews && window.refreshLiveOrderViews()).catch(() => {});
@@ -3671,8 +3711,10 @@ window.renderProses = () => {
   const c = document.getElementById('proses-results');
   const all = window.activeOrdersData || [];
   const visibleOrders = all.filter(o => isOrderInCurrentArea(o));
+  const ordersToRender = visibleOrders.length ? visibleOrders : all;
+  const showingAreaFallback = !visibleOrders.length && all.length > 0;
 
-  if (!visibleOrders.length) {
+  if (!ordersToRender.length) {
     c.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon"><span class="material-symbols-outlined">inbox</span></div>
       <h3>Tidak Ada Pesanan Di Area Ini</h3>
@@ -3680,6 +3722,13 @@ window.renderProses = () => {
     </div>`;
     window.updateDriverFabVisibility();
     return;
+  }
+
+  if (showingAreaFallback) {
+    c.innerHTML = `<div class="notice-card" style="margin:12px 14px 0;">
+      <span class="material-symbols-outlined">info</span>
+      <div>Pesanan aktif ditemukan, tetapi filter area tidak cocok. Saya tampilkan order aktif agar tidak hilang dari daftar proses.</div>
+    </div>`;
   }
 
   const trackStages = [
@@ -3712,7 +3761,7 @@ window.renderProses = () => {
   };
 
   let h = '';
-  visibleOrders.forEach(o => {
+  ordersToRender.forEach(o => {
     const stat = o.status;
     const isTrackReady = ['ambil', 'ngantar', 'menungguAntar', 'tiba'].includes(stat);
     const isMenungguAntar = stat === 'menungguAntar';
@@ -3834,13 +3883,8 @@ window.renderProses = () => {
           <div class="detail-row"><span class="detail-key">Penerima</span><span class="detail-val">${o.namaPenerima || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Ambil</span><span class="detail-val">${o.namaAmbil || '-'}</span></div>
           <div class="detail-row"><span class="detail-key">Antar</span><span class="detail-val">${o.NamaAntar || '-'}</span></div>
+          <div class="detail-row"><span class="detail-key">Catatan</span><span class="detail-val" style="white-space:pre-wrap;">${o.catatan || o.ORDERSN || o.ordersn || o.keterangan || '-'}</span></div>
         </div>
-        <div class="action-btns-grid">
-          ${o.waDriver ? `<a class="btn-whatsapp" href="https://wa.me/62${String(o.waDriver).replace(/[^0-9]/g, '').replace(/^0/, '')}" target="_blank">
-            <span class="material-symbols-outlined" style="font-size:18px;">chat</span> Hubungi Driver (WA)
-          </a>` : ''}
-        </div>
-        ${driverRowHtml ? `<div class="track-note">Tap kartu driver untuk melihat detail driver.</div>` : ''}
       </div>
     </div>`;
   });
@@ -4169,6 +4213,7 @@ window.switchPage = p => {
   document.getElementById('nav-' + p).classList.add('active');
   if (p === 'proses') window.renderProses();
   if (p === 'archive') window.renderArchive();
+  if (p === 'upload') window.updateUploadLockState();
   window.updateDriverFabVisibility();
 };
 
