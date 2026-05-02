@@ -49,7 +49,40 @@
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
   --shadow-blue: 0 4px 16px rgba(18,89,195,0.25);
+  --loading-overlay-bg: rgba(255,255,255,0.88);
+  --modal-overlay-bg: rgba(0,0,0,0.4);
+  --toast-bg: rgba(30, 30, 30, 0.72);
+  --toast-border: rgba(255,255,255,0.12);
+  --map-marker-border: #FFFFFF;
+  --map-marker-customer-border: #FFFFFF;
+  --area-primary-rgb: 18, 89, 195;
   --font: 'Noto Sans KR', -apple-system, sans-serif;
+}
+
+html[data-color-mode="dark"] {
+  color-scheme: dark;
+  --surface-bg: #0D1117;
+  --surface-card: #161B22;
+  --surface-input: #1E2430;
+  --surface-input-focus: #232A38;
+  --surface-secondary: #12161D;
+  --text-primary: #F5F7FA;
+  --text-secondary: #D0D5DD;
+  --text-tertiary: #98A2B3;
+  --text-disabled: #667085;
+  --border-light: #2A313D;
+  --border-medium: #344054;
+  --border-input: #344054;
+  --loading-overlay-bg: rgba(8, 10, 14, 0.84);
+  --modal-overlay-bg: rgba(0,0,0,0.62);
+  --toast-bg: rgba(12, 15, 20, 0.82);
+  --toast-border: rgba(255,255,255,0.08);
+  --oneui-blue-bg: rgba(var(--area-primary-rgb), 0.16);
+  --oneui-green-bg: rgba(14,122,69,0.18);
+  --oneui-red-bg: rgba(201,55,60,0.18);
+  --oneui-orange-bg: rgba(224,123,0,0.18);
+  --map-marker-border: #0D1117;
+  --map-marker-customer-border: #0D1117;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,7 +105,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
    ============================================================ */
 #loading-overlay {
   position: fixed; inset: 0;
-  background: rgba(255,255,255,0.88);
+  background: var(--loading-overlay-bg);
   backdrop-filter: blur(8px);
   z-index: 10000;
   display: none;
@@ -105,7 +138,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   top: 60px;
   left: 50%;
   transform: translateX(-50%) translateY(-20px);
-  background: rgba(30, 30, 30, 0.72);
+  background: var(--toast-bg);
   backdrop-filter: blur(16px) saturate(1.5);
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   color: rgba(255,255,255,0.95);
@@ -119,7 +152,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
   white-space: normal;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.07) inset;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--toast-border);
   opacity: 0;
   transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.16,1,0.3,1);
   max-width: calc(100vw - 40px);
@@ -135,7 +168,7 @@ input, textarea { user-select: auto; -webkit-user-select: auto; }
    ============================================================ */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 9500;
-  background: rgba(0,0,0,0.4);
+  background: var(--modal-overlay-bg);
   display: none;
   align-items: flex-end;
   justify-content: center;
@@ -1851,6 +1884,44 @@ textarea.field { resize: none; line-height: 1.5; }
 }
 .profile-info-row:active { background: var(--border-light); transform: scale(0.99); }
 
+.theme-switch-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin: 2px 0 8px;
+  letter-spacing: 0.03em;
+}
+
+.theme-switch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.theme-switch-btn {
+  padding: 11px 10px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--border-light);
+  background: var(--surface-input);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.theme-switch-btn:active {
+  transform: scale(0.98);
+}
+
+.theme-switch-btn.active {
+  background: var(--oneui-blue-bg);
+  border-color: var(--oneui-blue);
+  color: var(--oneui-blue);
+  box-shadow: var(--shadow-sm);
+}
+
 /* ============================================================
    INFO LIST
    ============================================================ */
@@ -2007,6 +2078,75 @@ textarea.field { resize: none; line-height: 1.5; }
   pointer-events: none;
 }
 
+.map-marker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.map-marker-wrap.dest {
+  width: 34px;
+  height: 34px;
+  background: var(--oneui-red);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  color: #fff;
+}
+
+.map-marker-wrap.driver {
+  width: 34px;
+  height: 34px;
+  background: var(--oneui-blue);
+  box-shadow: 0 2px 8px rgba(18,89,195,0.4);
+  color: #fff;
+}
+
+.map-marker-wrap.customer {
+  width: 14px;
+  height: 14px;
+  background: #4285F4;
+  border: 2.5px solid var(--map-marker-customer-border);
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+}
+
+html[data-color-mode="dark"] .maplibregl-ctrl,
+html[data-color-mode="dark"] .maplibregl-ctrl-group {
+  background: var(--surface-card);
+  border-color: var(--border-light);
+}
+
+html[data-color-mode="dark"] .maplibregl-ctrl button {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+html[data-color-mode="dark"] .notice-card,
+html[data-color-mode="dark"] .antrian-banner {
+  background: rgba(224,123,0,0.16);
+  border-color: rgba(224,123,0,0.24);
+  color: var(--text-primary);
+}
+
+html[data-color-mode="dark"] .gacoan-lock-badge,
+html[data-color-mode="dark"] .archive-date-chip,
+html[data-color-mode="dark"] .driver-list-wa,
+html[data-color-mode="dark"] .driver-mini-wa-badge {
+  background: rgba(37,211,102,0.12);
+}
+
+html[data-color-mode="dark"] .field-locked {
+  background: rgba(var(--area-primary-rgb),0.10) !important;
+  border-color: rgba(var(--area-primary-rgb),0.28) !important;
+}
+
+html[data-color-mode="dark"] .payment-option.selected,
+html[data-color-mode="dark"] .chip.selected,
+html[data-color-mode="dark"] .toggle-btn.active,
+html[data-color-mode="dark"] .auth-tab.active {
+  background: rgba(var(--area-primary-rgb),0.18);
+}
+
 /* ============================================================
    MICRO INTERACTIONS
    ============================================================ */
@@ -2096,6 +2236,13 @@ select.field { appearance: none; -webkit-appearance: none; background-image: url
         <div id="profile-area-display" style="font-size:13px; color:var(--text-tertiary); margin-top:2px;">-</div>
       </div>
       <span class="material-symbols-outlined" style="color:var(--text-tertiary); font-size:20px;">edit</span>
+    </div>
+    <div style="margin:14px 0 6px;">
+      <div class="theme-switch-label">Tampilan Warna</div>
+      <div class="theme-switch-grid">
+        <button class="theme-switch-btn" type="button" data-color-mode-btn="normal" onclick="window.applyColorMode('normal')">Normal</button>
+        <button class="theme-switch-btn" type="button" data-color-mode-btn="dark" onclick="window.applyColorMode('dark')">Gelap</button>
+      </div>
     </div>
     <button class="btn-outline-blue" onclick="window.openHelpWA()">
       <span class="material-symbols-outlined" style="font-size:18px;">help_outline</span> Pusat Bantuan
@@ -2657,6 +2804,7 @@ window.waktuType = 'Langsung';
 window.jenisOngkir = 'Normal';
 window.selectedPayment = 'COD'; // NEW: default payment
 window.mapInstances = {};
+window.mapRouteState = {};
 window.mapCenters = {};
 window.arrivalRingInterval = null;
 window.currentArrivalOrderId = null;
@@ -2777,6 +2925,8 @@ window.applyAreaTheme = (area, opts = {}) => {
   root.style.setProperty('--oneui-blue-dark', meta.dark);
   root.style.setProperty('--border-focus', meta.primary);
   root.style.setProperty('--shadow-blue', `0 4px 16px ${meta.primary}40`);
+  const rgb = meta.primary.replace('#', '').match(/.{2}/g)?.map(v => parseInt(v, 16)).join(', ') || '18, 89, 195';
+  root.style.setProperty('--area-primary-rgb', rgb);
   if (document.getElementById('app')?.classList.contains('visible') || opts.forceBrand) {
     window.updateBranding(area);
   } else {
@@ -2785,6 +2935,61 @@ window.applyAreaTheme = (area, opts = {}) => {
   if (!opts.silent) {
     window.saveAreaPreference(area);
   }
+};
+
+window.getSavedColorMode = () => {
+  try {
+    const mode = localStorage.getItem('jastipgo_color_mode') || 'normal';
+    return mode === 'dark' ? 'dark' : 'normal';
+  } catch (e) {
+    return 'normal';
+  }
+};
+
+window.getMapStyleUrl = (mode) => {
+  return mode === 'dark'
+    ? 'https://tiles.openfreemap.org/styles/dark'
+    : 'https://tiles.openfreemap.org/styles/bright';
+};
+
+window.getThemePrimaryColor = () => {
+  const root = document.documentElement;
+  return getComputedStyle(root).getPropertyValue('--oneui-blue').trim() || '#1259C3';
+};
+
+window.getThemeColor = (varName, fallback = '') => {
+  const root = document.documentElement;
+  return getComputedStyle(root).getPropertyValue(varName).trim() || fallback;
+};
+
+window.updateThemeButtons = (mode) => {
+  document.querySelectorAll('[data-color-mode-btn]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.colorModeBtn === mode);
+  });
+};
+
+window.applyColorMode = (mode, opts = {}) => {
+  const normalized = mode === 'dark' ? 'dark' : 'normal';
+  const root = document.documentElement;
+  root.dataset.colorMode = normalized;
+  try {
+    if (!opts.silent) localStorage.setItem('jastipgo_color_mode', normalized);
+  } catch (e) {}
+  window.updateThemeButtons(normalized);
+
+  const mapStyle = window.getMapStyleUrl(normalized);
+  Object.entries(window.mapInstances || {}).forEach(([orderId, map]) => {
+    if (!map || typeof map.setStyle !== 'function') return;
+    const state = window.mapRouteState?.[orderId];
+    try {
+      map.setStyle(mapStyle);
+      map.once('style.load', () => {
+        if (state && state.startPoint && state.destCoords) {
+          drawRouteOSRM(map, state.startPoint, state.destCoords, state.routeId, state.orderData);
+        }
+      });
+    } catch (e) {}
+  });
 };
 
 window.showAreaUnavailableModal = (area) => {
@@ -3085,6 +3290,7 @@ window.updateLiveClock = () => {
 /* ========== AUTENTIKASI ========== */
 window.sessionCheckTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
+  window.applyColorMode(window.getSavedColorMode(), { silent: true });
   showLoading('Mengecek sesi login...');
   closeLoginWaitModal();
   if (window.sessionCheckTimer) clearTimeout(window.sessionCheckTimer);
@@ -3556,7 +3762,7 @@ async function drawRouteOSRM(map, startLngLat, endLngLat, routeId, orderData) {
         map.addLayer({
           id: routeId, type: 'line', source: routeId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': '#1259C3', 'line-width': 4 }
+          paint: { 'line-color': window.getThemePrimaryColor ? window.getThemePrimaryColor() : '#1259C3', 'line-width': 4 }
         });
       }
     }
@@ -3707,6 +3913,12 @@ window.refreshProses = () => {
   window.renderProses();
 };
 
+window.canCancelOrder = (order) => {
+  if (!order) return false;
+  const stat = String(order.status || '').trim().toLowerCase();
+  return stat === 'menunggu' && !getAssignedDriverId(order);
+};
+
 window.renderProses = () => {
   const c = document.getElementById('proses-results');
   const all = window.activeOrdersData || [];
@@ -3829,13 +4041,13 @@ window.renderProses = () => {
     let paymentBadge = o.pembayaran ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--r-full);background:${o.pembayaran==='Transfer'?'var(--oneui-blue-bg)':'var(--oneui-green-bg)'};color:${o.pembayaran==='Transfer'?'var(--oneui-blue)':'var(--oneui-green)'};">${o.pembayaran==='Transfer'?' Transfer':' COD'}</span>` : '';
 
     const mapStageHtml = isTrackReady ? `
-      <div id="map-container-${o.id}" style="position:relative;height:300px;overflow:hidden;background:linear-gradient(180deg, rgba(18,89,195,0.06), rgba(255,255,255,0.92));">
+      <div id="map-container-${o.id}" style="position:relative;height:300px;overflow:hidden;background:linear-gradient(180deg, rgba(var(--area-primary-rgb),0.08), var(--surface-card));">
         <div id="eta-${o.id}" class="eta-pill">Estimasi: Menghitung...</div>
         <button onclick="if(window.mapCenters['${o.id}']) window.mapCenters['${o.id}']()" class="map-center-btn" aria-label="Pusatkan peta">
           <span class="material-symbols-outlined">my_location</span>
         </button>
       </div>` : `
-      <div style="position:relative;height:300px;overflow:hidden;background:linear-gradient(180deg, rgba(18,89,195,0.06), rgba(255,255,255,0.92));display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;">
+      <div style="position:relative;height:300px;overflow:hidden;background:linear-gradient(180deg, rgba(var(--area-primary-rgb),0.08), var(--surface-card));display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;">
         <div style="position:relative;z-index:1;max-width:240px;">
           <div style="width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:var(--oneui-blue-bg);display:flex;align-items:center;justify-content:center;color:var(--oneui-blue);box-shadow:var(--shadow-sm);"><span class="material-symbols-outlined">route</span></div>
           <div style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:-0.2px;">Map belum aktif</div>
@@ -3850,7 +4062,12 @@ window.renderProses = () => {
           <div class="order-card-type">${createdAtText} berlalu · ${orderMetaLabel}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-          <span class="status-pill ${statusClass}">${statusLabel}</span>
+          <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+            ${window.canCancelOrder(o) ? `<button class="cancel-order-btn" type="button" aria-label="Batalkan pesanan" title="Batalkan pesanan" onclick="event.stopPropagation(); window.batalOrder('${o.id}')">
+              <span class="material-symbols-outlined">local_fire_department</span>
+            </button>` : ''}
+            <span class="status-pill ${statusClass}">${statusLabel}</span>
+          </div>
           ${paymentBadge}
         </div>
       </div>
@@ -3902,29 +4119,34 @@ window.renderProses = () => {
           mEl.dataset.initialized = "true";
           let destCoords = exC(o.mpasAntar) || [110.421, -6.982];
 
+          const mapStyle = window.getMapStyleUrl(window.getSavedColorMode());
           const map = new maplibregl.Map({
             container: 'map-container-' + o.id,
-            style: 'https://tiles.openfreemap.org/styles/bright',
+            style: mapStyle,
             center: destCoords,
             zoom: 14,
             attributionControl: false
           });
 
           window.mapInstances[o.id] = map;
+          window.mapRouteState[o.id] = { map, startPoint: null, destCoords, routeId: 'route-' + o.id, orderData: o };
+          map._jastipgoOrderId = o.id;
 
           const elDest = document.createElement('div');
-          elDest.innerHTML = '<div style="background:#C9373C;padding:5px;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#FFF;font-size:16px;">home</span></div>';
+          elDest.className = 'map-marker-wrap dest';
+          elDest.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">home</span>';
           new maplibregl.Marker({ element: elDest }).setLngLat(destCoords).addTo(map);
 
           const elM = document.createElement('div');
-          elM.innerHTML = '<div style="background:#1259C3;padding:5px;border-radius:50%;box-shadow:0 2px 8px rgba(18,89,195,0.4);display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#FFF;font-size:18px;">two_wheeler</span></div>';
+          elM.className = 'map-marker-wrap driver';
+          elM.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">two_wheeler</span>';
 
           let initialDriverCoords = exC(o.sharelocationDriver) || exC(o.titikAmbil) || exC(o.mapsAmbil) || destCoords;
           const driverMarker = new maplibregl.Marker({ element: elM }).setLngLat(initialDriverCoords).addTo(map);
           window.currentDriverMarkers[o.id] = driverMarker;
 
           const elCustomer = document.createElement('div');
-          elCustomer.innerHTML = '<div style="width:14px;height:14px;background:#4285F4;border:2.5px solid #FFF;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.3);"></div>';
+          elCustomer.className = 'map-marker-wrap customer';
           const customerMarker = new maplibregl.Marker({ element: elCustomer }).setLngLat([0, 0]).addTo(map);
 
           if (navigator.geolocation) {
@@ -3942,6 +4164,7 @@ window.renderProses = () => {
             }
 
             let startPoint = exC(o.titikAmbil) || exC(o.mapsAmbil);
+            if (window.mapRouteState[o.id]) window.mapRouteState[o.id].startPoint = startPoint || null;
             if (startPoint) { drawRouteOSRM(map, startPoint, destCoords, 'route-' + o.id, o); }
 
             let etaEl = document.getElementById('eta-' + o.id);
