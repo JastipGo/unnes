@@ -3102,6 +3102,11 @@ function getAssignedDriverId(obj) {
   return String(obj.getdriverId || obj.GetdriverID || obj.driverId || obj.DriverID || '').trim();
 }
 
+function getAssignedCustomerId(obj) {
+  if (!obj) return '';
+  return String(obj.customerId || obj.CustomerID || obj.customerID || '').trim();
+}
+
 function getOrderCreatedAtMs(order) {
   if (!order || !order.createdAt) return 0;
   const raw = order.createdAt;
@@ -3607,11 +3612,20 @@ window.doUpload = async () => {
     return showToast('Ongkir Nebeng dibatalkan karena lokasi pengambilan diubah.');
   }
 
+  const uid = currentUserUid || auth.currentUser?.uid || '';
+  if (!uid) {
+    return showToast('Sesi login belum siap. Coba lagi sebentar.');
+  }
+
   const orderData = {
     createdAt: new Date().toISOString(),
-    customerId: currentUserUid,
+    customerId: uid,
+    CustomerID: uid,
+    customerID: uid,
+    driverId: "",
     getdriverId: "",
-    areaLayanan: currentUserData?.areaLayanan || loadAreaFromLocalStorage(currentUserUid) || 'UNNES',
+    GetdriverID: "",
+    areaLayanan: currentUserData?.areaLayanan || loadAreaFromLocalStorage(uid) || 'UNNES',
     kategori: selectedType,
     jenisOngkir: window.jenisOngkir,
     jenisOrder: window.jenisOngkir === 'Nebeng' ? 'gabungan' : 'normal',
@@ -3635,6 +3649,8 @@ window.doUpload = async () => {
     titikAmbil: "",
     sharelocationDriver: "",
     status: 'menunggu',
+    Status: 'menunggu',
+    orderStatus: 'menunggu',
     urlbuktiAmbil: "",
     urlbuktiSelesai: ""
   };
@@ -3715,8 +3731,14 @@ function subscribeOrders() {
       window.prevOrderStats[o.id] = o.status;
     });
 
-    window.activeOrdersData = a.filter(o => o.status !== 'selesai' && o.status !== 'dibatalkan');
-    window.historyOrdersData = a.filter(o => o.status === 'selesai' || o.status === 'dibatalkan');
+    window.activeOrdersData = a.filter(o => {
+      const st = String(o.status || o.Status || o.orderStatus || '').trim();
+      return st !== 'selesai' && st !== 'dibatalkan';
+    });
+    window.historyOrdersData = a.filter(o => {
+      const st = String(o.status || o.Status || o.orderStatus || '').trim();
+      return st === 'selesai' || st === 'dibatalkan';
+    });
 
     window.activeOrdersData.forEach(o => {
       if (o.status === 'ambil' || o.status === 'ngantar') window.ensureEtaForOrder(o);
