@@ -3023,6 +3023,7 @@ window.setProfileArea = (area) => {
   if (info) info.innerText = `Area layanan: ${meta.short}`;
 };
 
+
 window.restoreEtaTargets = () => {
   const store = getSavedEtaStore();
   Object.entries(store).forEach(([orderId, data]) => {
@@ -3031,17 +3032,80 @@ window.restoreEtaTargets = () => {
   });
 };
 
+function normalizeCoordValue(value) {
+  if (value == null) return null;
+  if (Array.isArray(value) && value.length >= 2) {
+    const lat = Number(value[0]);
+    const lng = Number(value[1]);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  }
+  if (typeof value === 'object') {
+    const lat = Number(value.lat ?? value.latitude ?? value.y);
+    const lng = Number(value.lng ?? value.lon ?? value.longitude ?? value.x);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    return null;
+  }
+  const text = String(value).trim();
+  if (!text) return null;
+  const cleaned = text.replace(/[()\[\]]/g, '');
+  const parts = cleaned.split(',').map(v => Number(String(v).trim()));
+  if (parts.length >= 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+    return { lat: parts[0], lng: parts[1] };
+  }
+  return null;
+}
+
+function haversineKm(a, b) {
+  if (!a || !b) return 0;
+  const R = 6371;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0, 1 - h))));
+}
+
+function getEtaSpeedKmh(jenisOngkir) {
+  return String(jenisOngkir || '').toLowerCase() === 'nebeng' ? 18 : 24;
+}
+
+function formatEtaLabel(minutes) {
+  const m = Math.max(1, Math.round(minutes || 0));
+  if (m < 60) return `${m} menit`;
+  const h = Math.floor(m / 60);
+  const rest = m % 60;
+  return rest ? `${h} jam ${rest} menit` : `${h} jam`;
+}
+
 window.setOrderEtaTarget = (order) => {
   if (!order || !order.id) return;
-  if (order.status !== 'ngantar' && order.status !== 'ambil') return;
+  if (String(order.status || '').trim().toLowerCase() !== 'ngantar') return;
   if (window.orderEtaTarget[order.id]) return;
-  const mins = order.jenisOngkir === 'Nebeng' ? 60 : 30;
+
+  const driverPos = normalizeCoordValue(order.sharelocationDriver);
+  const destPos = normalizeCoordValue(order.mpasAntar || order.mapsAntar || order.NamaAntar || order.namaAntar || order.titikAntar || order.destination);
+  let distanceKm = driverPos && destPos ? haversineKm(driverPos, destPos) : Number(order.JarakTempuh || 0);
+  if (!Number.isFinite(distanceKm) || distanceKm <= 0) return;
+
+  const speedKmh = getEtaSpeedKmh(order.jenisOngkir);
+  const travelMinutes = Math.max(3, Math.round((distanceKm / speedKmh) * 60));
   const startedAt = Date.now();
-  const targetAt = startedAt + mins * 60 * 1000;
+  const targetAt = startedAt + (travelMinutes * 60 * 1000);
+
   window.orderEtaStartedAt[order.id] = startedAt;
   window.orderEtaTarget[order.id] = targetAt;
   const store = getSavedEtaStore();
-  store[order.id] = { startedAt, targetAt, mins, jenisOngkir: order.jenisOngkir || 'Normal' };
+  store[order.id] = {
+    startedAt,
+    targetAt,
+    travelMinutes,
+    distanceKm: Number(distanceKm.toFixed(2)),
+    speedKmh,
+    jenisOngkir: order.jenisOngkir || 'Normal',
+    source: 'sharelocationDriver'
+  };
   saveEtaStore(store);
 };
 
@@ -3049,16 +3113,17 @@ window.syncEtaTargetFromStore = (orderId) => {
   const store = getSavedEtaStore();
   if (store[orderId] && store[orderId].targetAt) {
     window.orderEtaTarget[orderId] = store[orderId].targetAt;
-    window.orderEtaStartedAt[orderId] = store[orderId].startedAt || (store[orderId].targetAt - ((store[orderId].mins || 30) * 60 * 1000));
+    window.orderEtaStartedAt[orderId] = store[orderId].startedAt || (store[orderId].targetAt - ((store[orderId].travelMinutes || 30) * 60 * 1000));
   }
 };
 
 window.ensureEtaForOrder = (order) => {
   if (!order || !order.id) return;
   window.syncEtaTargetFromStore(order.id);
-  if ((order.status === 'ngantar' || order.status === 'ambil') && !window.orderEtaTarget[order.id]) {
-    window.setOrderEtaTarget(order);
-  }
+  if (window.orderEtaTarget[order.id]) return;
+  if (String(order.status || '').trim().toLowerCase() !== 'ngantar') return;
+  if (!order.sharelocationDriver) return;
+  window.setOrderEtaTarget(order);
 };
 
 window.formatAreaLabel = (area) => getAreaMeta(area).short;
@@ -3099,7 +3164,12 @@ function hideLoading() { document.getElementById('loading-overlay').classList.re
 /* ========== HELPER NORMALISASI DRIVER & WAKTU ========== */
 function getAssignedDriverId(obj) {
   if (!obj) return '';
-  return String(obj.getdriverId || obj.GetdriverID || obj.driverId || obj.DriverID || '').trim();
+  return String(obj.getdriverId || obj.getdriverId || obj.driverId || obj.DriverID || '').trim();
+}
+
+function getAssignedCustomerId(obj) {
+  if (!obj) return '';
+  return String(obj.customerId || obj.CustomerID || obj.customerID || '').trim();
 }
 
 function getOrderCreatedAtMs(order) {
@@ -3430,7 +3500,7 @@ window.doSignup = async () => {
   try {
     const c = await createUserWithEmailAndPassword(auth, e, p);
     await setDoc(doc(db, "user", c.user.uid), {
-      CustomerID: c.user.uid, GetdriverID: "", nama: n, wa: ph, email: e,
+      CustomerID: c.user.uid, getdriverId: "", nama: n, wa: ph, email: e,
       areaLayanan: 'UNNES',
       urlProfile: '', role: 'customer', saldo: 0, stnk: "", sim: "", skck: "", ktp: "", status: 'belumterverifikasi'
     });
@@ -3454,7 +3524,7 @@ window.saveCompleteProfile = async () => {
   showLoading("Menyimpan...");
   try {
     await setDoc(doc(db, "user", currentUserUid), {
-      CustomerID: currentUserUid, GetdriverID: "", nama: n, wa: ph, email: currentUserEmail,
+      CustomerID: currentUserUid, getdriverId: "", nama: n, wa: ph, email: currentUserEmail,
       areaLayanan: area,
       urlProfile: '', role: 'customer', saldo: 0, stnk: "", sim: "", skck: "", ktp: "", status: 'belumterverifikasi'
     }, { merge: true });
@@ -3607,11 +3677,19 @@ window.doUpload = async () => {
     return showToast('Ongkir Nebeng dibatalkan karena lokasi pengambilan diubah.');
   }
 
+  const uid = currentUserUid || auth.currentUser?.uid || '';
+  if (!uid) {
+    return showToast('Sesi login belum siap. Coba lagi sebentar.');
+  }
+
   const orderData = {
     createdAt: new Date().toISOString(),
-    customerId: currentUserUid,
+    customerId: uid,
+    CustomerID: uid,
+    customerID: uid,
+    driverId: "",
     getdriverId: "",
-    areaLayanan: currentUserData?.areaLayanan || loadAreaFromLocalStorage(currentUserUid) || 'UNNES',
+    areaLayanan: currentUserData?.areaLayanan || loadAreaFromLocalStorage(uid) || 'UNNES',
     kategori: selectedType,
     jenisOngkir: window.jenisOngkir,
     jenisOrder: window.jenisOngkir === 'Nebeng' ? 'gabungan' : 'normal',
@@ -3635,6 +3713,8 @@ window.doUpload = async () => {
     titikAmbil: "",
     sharelocationDriver: "",
     status: 'menunggu',
+    Status: 'menunggu',
+    orderStatus: 'menunggu',
     urlbuktiAmbil: "",
     urlbuktiSelesai: ""
   };
@@ -3715,8 +3795,14 @@ function subscribeOrders() {
       window.prevOrderStats[o.id] = o.status;
     });
 
-    window.activeOrdersData = a.filter(o => o.status !== 'selesai' && o.status !== 'dibatalkan');
-    window.historyOrdersData = a.filter(o => o.status === 'selesai' || o.status === 'dibatalkan');
+    window.activeOrdersData = a.filter(o => {
+      const st = String(o.status || o.Status || o.orderStatus || '').trim();
+      return st !== 'selesai' && st !== 'dibatalkan';
+    });
+    window.historyOrdersData = a.filter(o => {
+      const st = String(o.status || o.Status || o.orderStatus || '').trim();
+      return st === 'selesai' || st === 'dibatalkan';
+    });
 
     window.activeOrdersData.forEach(o => {
       if (o.status === 'ambil' || o.status === 'ngantar') window.ensureEtaForOrder(o);
@@ -3886,15 +3972,35 @@ async function fetchDriverList(force = false) {
   return window.cachedDriverList;
 }
 
+
 /* ========== SMART ETA DARI JARAK DRIVER (ambil sekali) ========== */
 async function computeSmartEtaFromDriver(orderId, driverCoords, destCoords, jenisOngkir, kategori) {
-  if (window.orderEtaTarget[orderId]) return;
-  const mins = jenisOngkir === 'Nebeng' ? 60 : 30;
-  const targetAt = Date.now() + mins * 60 * 1000;
+  if (!orderId || window.orderEtaTarget[orderId]) return;
+  const driverPos = normalizeCoordValue(driverCoords);
+  const destPos = normalizeCoordValue(destCoords);
+  if (!driverPos || !destPos) return;
+
+  const distanceKm = haversineKm(driverPos, destPos);
+  if (!Number.isFinite(distanceKm) || distanceKm <= 0) return;
+
+  const speedKmh = getEtaSpeedKmh(jenisOngkir);
+  const travelMinutes = Math.max(3, Math.round((distanceKm / speedKmh) * 60));
+  const startedAt = Date.now();
+  const targetAt = startedAt + (travelMinutes * 60 * 1000);
+
+  window.orderEtaStartedAt[orderId] = startedAt;
   window.orderEtaTarget[orderId] = targetAt;
-  window.orderEtaStartedAt[orderId] = Date.now();
   const store = getSavedEtaStore();
-  store[orderId] = { startedAt: window.orderEtaStartedAt[orderId], targetAt, mins, jenisOngkir: jenisOngkir || 'Normal' };
+  store[orderId] = {
+    startedAt,
+    targetAt,
+    travelMinutes,
+    distanceKm: Number(distanceKm.toFixed(2)),
+    speedKmh,
+    jenisOngkir: jenisOngkir || 'Normal',
+    kategori: kategori || '',
+    source: 'sharelocationDriver'
+  };
   saveEtaStore(store);
 }
 
@@ -3985,7 +4091,7 @@ window.renderProses = () => {
     const createdAtText = formatOrderAge(o.createdAt);
     const orderMetaLabel = o.jenisOngkir || 'Normal';
     const heroTitle = isTrackReady ? 'Delivering your order' : 'Tracking pesanan';
-    const heroSub = isTrackReady ? 'Map aktif saat status Ambil dan mengikuti rute antar.' : 'Map akan tampil setelah status Ambil.';
+    const heroSub = stat === 'menungguAntar' ? 'Order dalam pengantaran gabungan. Tunggu giliran antar berikutnya.' : (isTrackReady ? 'Map aktif saat status Ambil dan mengikuti rute antar.' : 'Map akan tampil setelah status Ambil.');
 
     const stepsHtml = trackStages.map((stage, idx) => {
       const state = stageState[idx];
@@ -4159,7 +4265,7 @@ window.renderProses = () => {
 
           map.on('load', async () => {
             let driverCoords = exC(o.sharelocationDriver);
-            if (driverCoords && !window.orderEtaTarget[o.id]) {
+            if (o.status === 'ngantar' && driverCoords && !window.orderEtaTarget[o.id]) {
               await computeSmartEtaFromDriver(o.id, driverCoords, destCoords, o.jenisOngkir, o.kategori);
             }
 
@@ -4172,9 +4278,11 @@ window.renderProses = () => {
               window.ensureEtaForOrder(o);
               if (window.etaIntervals[o.id]) clearInterval(window.etaIntervals[o.id]);
               window.etaIntervals[o.id] = setInterval(() => {
-                window.syncEtaTargetFromStore(o.id);
+                window.ensureEtaForOrder(o);
                 if (!window.orderEtaTarget[o.id]) {
-                  etaEl.innerText = (o.status === 'ngantar' || o.status === 'ambil') ? 'Estimasi: Menunggu target...' : 'Estimasi: Belum mulai';
+                  if (o.status === 'menungguAntar') etaEl.innerText = 'Estimasi: Order dalam pengantaran gabungan';
+                  else if (o.status === 'ngantar') etaEl.innerText = 'Estimasi: Menunggu data lokasi driver...';
+                  else etaEl.innerText = 'Estimasi: Belum dihitung';
                   return;
                 }
                 let sisaDetik = Math.max(0, Math.round((window.orderEtaTarget[o.id] - Date.now()) / 1000));
